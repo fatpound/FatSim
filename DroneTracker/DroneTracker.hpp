@@ -60,11 +60,11 @@ namespace fatsim
 
 
     private:
-        auto CaptureFrame_()           -> cv::Mat;
-        auto GetFrameDifference_()     -> cv::Mat;
+        auto CaptureFrame_          () -> cv::Mat;
+        auto GetFrameDifference_    () -> cv::Mat;
         auto GetDilatedThresholdImg_() -> cv::Mat;
 
-        auto ReceivedContinueMsg_()  -> bool;
+        auto ReceivedContinueMsg_() -> bool;
 
         void ShowDetectedDrone_();
 

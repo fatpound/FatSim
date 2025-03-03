@@ -2,12 +2,9 @@
 
 int main()
 {
-	fatsim::DroneTracker droneTracker(
-		{ { "alpsword", msr::airlib::ImageCaptureBase::ImageType::Segmentation, false, false } },
-		true
-	);
+	using enum msr::airlib::ImageCaptureBase::ImageType;
 
-	droneTracker.Run();
+	fatsim::DroneTracker({ { "alpsword", Segmentation, false, false } }, true).Run();
 
 	return 0;
 }

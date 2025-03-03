@@ -22,9 +22,8 @@ namespace fatsim
 
 
     public:
-        DroneRouter(Route_t route);
+        DroneRouter(Route_t route = { {0, 5, -14}, {0, 55, -14} });
 
-        DroneRouter() = delete;
         DroneRouter(const DroneRouter&)     = delete;
         DroneRouter(DroneRouter&&) noexcept = delete;
 
