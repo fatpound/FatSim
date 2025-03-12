@@ -18,11 +18,10 @@ namespace fatsim
 
     public:
         using Position_t = msr::airlib::Vector3r;
-        using Route_t = std::vector<Position_t>;
 
 
     public:
-        DroneRouter(Route_t route);
+        DroneRouter(std::vector<Position_t> route);
 
         DroneRouter()                       = delete;
         DroneRouter(const DroneRouter&)     = delete;
@@ -49,7 +48,7 @@ namespace fatsim
     private:
         msr::airlib::MultirotorRpcLibClient m_rpc_client_;
 
-        Route_t m_route_;
+        std::vector<Position_t> m_route_;
 
         ZMQPublisher m_zmq_publisher_;
 

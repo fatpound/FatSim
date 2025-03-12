@@ -19,11 +19,9 @@ namespace fatsim
     public:
         using ImgRequest_t = msr::airlib::ImageCaptureBase::ImageRequest;
 
-        using ImgRequestVector_t = std::vector<ImgRequest_t>;
-
 
     public:
-        DroneTracker(ImgRequestVector_t imgRequests, bool fromExternalCamera = false);
+        DroneTracker(std::vector<ImgRequest_t> imgRequests, bool fromExternalCamera = false);
 
         DroneTracker() = delete;
         DroneTracker(const DroneTracker&) = delete;
@@ -60,19 +58,19 @@ namespace fatsim
 
 
     private:
-        auto CaptureFrame_          () -> cv::Mat;
-        auto GetFrameDifference_    () -> cv::Mat;
-        auto GetDilatedThresholdImg_() -> cv::Mat;
+        auto CaptureFrame_           () -> cv::Mat;
+        auto GetFrameDifference_     () -> cv::Mat;
+        auto GetDilatedThresholdImg_ () -> cv::Mat;
 
-        auto ReceivedContinueMsg_() -> bool;
+        auto ReceivedContinueMsg_    () -> bool;
 
-        void ShowDetectedDrone_();
+        void ShowDetectedDrone_      ();
 
 
     private:
         msr::airlib::MultirotorRpcLibClient m_rpc_client_;
 
-        ImgRequestVector_t m_img_requests_;
+        std::vector<ImgRequest_t> m_img_requests_;
 
         ZMQSubscriber m_zmq_subscriber_;
         

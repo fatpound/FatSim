@@ -2,7 +2,7 @@
 
 namespace fatsim
 {
-    DroneRouter::DroneRouter(Route_t route)
+    DroneRouter::DroneRouter(std::vector<Position_t> route)
         :
         m_route_(std::move(route)),
         m_msg_kernel_(&DroneRouter::SendZMQMessage_, this)

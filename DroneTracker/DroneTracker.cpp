@@ -2,7 +2,7 @@
 
 namespace fatsim
 {
-    DroneTracker::DroneTracker(ImgRequestVector_t imgRequests, bool fromExternalCamera)
+    DroneTracker::DroneTracker(std::vector<ImgRequest_t> imgRequests, bool fromExternalCamera)
         :
         m_img_requests_(std::move(imgRequests)),
         mc_from_external_camera_(fromExternalCamera)
