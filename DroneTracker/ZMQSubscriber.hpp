@@ -1,8 +1,8 @@
 #pragma once
 
 #define ZMQ_STATIC
-
 #include <zmq.h>
+#undef ZMQ_STATIC
 
 #pragma comment(lib, "iphlpapi") // Win32 IP Helper API
 
