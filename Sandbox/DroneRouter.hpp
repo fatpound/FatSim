@@ -14,7 +14,7 @@ namespace fatsim
 {
     class DroneRouter final
     {
-        static constexpr auto scx_DroneSpeed_ = 2.0f;
+        static constexpr auto scx_DroneSpeed_ = 5.0f;
 
     public:
         using Position_t = msr::airlib::Vector3r;
@@ -22,8 +22,9 @@ namespace fatsim
 
 
     public:
-        DroneRouter(Route_t route = { {0, 5, -14}, {0, 55, -14} });
+        DroneRouter(Route_t route);
 
+        DroneRouter()                       = delete;
         DroneRouter(const DroneRouter&)     = delete;
         DroneRouter(DroneRouter&&) noexcept = delete;
 

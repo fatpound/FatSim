@@ -54,10 +54,14 @@ namespace fatsim
     {
         for (const auto& point : m_route_)
         {
-            std::println<>("Drone'un gitmekte oldugu konum: {0} {1} {2}", point.x(), point.y(), point.z());
+            const auto x = point.x();
+            const auto y = point.y();
+            const auto z = point.z();
+
+            std::println<>("Drone'un gitmekte oldugu konum: {0} {1} {2}", x, y, z);
 
             m_drone_is_moving_ = true;
-            m_rpc_client_.moveToPositionAsync(point.x(), point.y(), point.z(), scx_DroneSpeed_)->waitOnLastTask();
+            m_rpc_client_.moveToPositionAsync(x / 100.0f, y / 100.0f, -(z / 100.0f), scx_DroneSpeed_)->waitOnLastTask();
             m_drone_is_moving_ = false;
         }
     }
