@@ -80,7 +80,7 @@ namespace fatsim
 
     auto DroneTracker::ReceivedContinueMsg_() -> bool
     {
-        std::array<char, ZMQSubscriber::BufferSize> buffer;
+        std::array<char, fatx::zeromq::Subscriber::scx_BufferSize> buffer;
 
         const auto bytesReceived = m_zmq_subscriber_.Receive(buffer);
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ZMQPublisher.hpp"
+#include "FatX/ZeroMQ/Publisher.hpp"
 
 #include <vehicles/multirotor/api/MultirotorRpcLibClient.hpp>
 
@@ -50,7 +50,7 @@ namespace fatsim
 
         std::vector<Position_t> m_route_;
 
-        ZMQPublisher m_zmq_publisher_;
+        fatx::zeromq::Publisher m_zmq_publisher_;
 
         std::atomic_bool m_drone_is_moving_{};
         std::atomic_bool m_finished_{};

@@ -21,12 +21,12 @@
     <ClCompile Include="DroneRouter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ZMQPublisher.cpp">
+    <ClCompile Include="FatX\ZeroMQ\Publisher.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ZMQPublisher.hpp">
+    <ClInclude Include="FatX\ZeroMQ\Publisher.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="DroneRouter.hpp">

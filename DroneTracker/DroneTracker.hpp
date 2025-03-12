@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ZMQSubscriber.hpp"
+#include "FatX/ZeroMQ/Subscriber.hpp"
 
 #include <vehicles/multirotor/api/MultirotorRpcLibClient.hpp>
 
@@ -72,7 +72,7 @@ namespace fatsim
 
         std::vector<ImgRequest_t> m_img_requests_;
 
-        ZMQSubscriber m_zmq_subscriber_;
+        fatx::zeromq::Subscriber m_zmq_subscriber_;
         
         const bool mc_from_external_camera_;
 
