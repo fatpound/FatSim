@@ -6,13 +6,12 @@
   </PropertyGroup>
   <PropertyGroup />
   <ItemDefinitionGroup>
-    <ClCompile />
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(AIRSIM_PATH)AirLib\Include;$(AIRSIM_PATH)AirLib\deps\eigen3</AdditionalIncludeDirectories>
+    </ClCompile>
     <Link>
       <AdditionalDependencies>AirLib.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
-    <ClCompile>
-      <AdditionalIncludeDirectories>$(AIRSIM_PATH)AirLib\Include;$(AIRSIM_PATH)AirLib\deps\eigen3;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-    </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
     <BuildMacro Include="AIRSIM_PATH">
