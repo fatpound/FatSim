@@ -4,8 +4,13 @@ namespace fatsim
 {
     DroneRouter::DroneRouter(std::vector<Position_t> route)
         :
-        m_route_(std::move(route)),
+        m_route_(std::move<>(route)),
+#pragma region (thread w/o C4355)
+#pragma warning (push)
+#pragma warning (disable : 4355)
         m_msg_kernel_(&DroneRouter::SendZMQMessage_, this)
+#pragma warning (pop)
+#pragma endregion
     {
         m_rpc_client_.confirmConnection();
         m_rpc_client_.enableApiControl(true);
@@ -74,7 +79,7 @@ namespace fatsim
             using std::literals::string_literals::operator ""s;
             using std::literals::chrono_literals::operator ""ms;
 
-            m_zmq_publisher_.Publish("FATSIM_DRONE_"s + (m_drone_is_moving_ ? "MOVING" : "STOPPED"));
+            m_zmq_publisher_.Publish("FATSIM_DRONE_"s + (m_drone_is_moving_ ? "MOVING"s : "STOPPED"s));
 
             std::this_thread::sleep_for(50ms);
         }

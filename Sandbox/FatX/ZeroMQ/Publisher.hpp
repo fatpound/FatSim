@@ -14,7 +14,7 @@ namespace fatx::zeromq
     class Publisher final
     {
     public:
-        Publisher(const std::string& addr = "tcp://localhost:5555");
+        Publisher(const std::string& address = "tcp://localhost:5555");
 
         Publisher(const Publisher&)     = delete;
         Publisher(Publisher&&) noexcept = delete;
@@ -33,6 +33,6 @@ namespace fatx::zeromq
 
     private:
         ::zmq::context_t m_context_;
-        ::zmq::socket_t m_publisher_;
+        ::zmq::socket_t  m_publisher_;
     };
 }

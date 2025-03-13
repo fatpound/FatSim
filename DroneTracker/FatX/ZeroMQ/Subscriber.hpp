@@ -13,7 +13,8 @@ namespace fatx::zeromq
     class Subscriber final
     {
     public:
-        Subscriber(const std::string& addr = "tcp://localhost:5555");
+        Subscriber(const std::string& address = "tcp://localhost:5555");
+
         Subscriber(const Subscriber&)     = delete;
         Subscriber(Subscriber&&) noexcept = delete;
 
