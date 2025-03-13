@@ -31,7 +31,7 @@ namespace fatx::zeromq
 
 
     public:
-        auto Receive(Buffer_t& buffer) -> int;
+        auto Receive(Buffer_t& buffer) noexcept -> int;
 
 
     protected:

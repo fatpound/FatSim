@@ -13,7 +13,8 @@ namespace fatx::zeromq
     class Publisher final
     {
     public:
-        Publisher();
+        Publisher(const char* const pAddr = "tcp://*:5555") noexcept;
+
         Publisher(const Publisher&)     = delete;
         Publisher(Publisher&&) noexcept = delete;
 
@@ -23,7 +24,7 @@ namespace fatx::zeromq
 
 
     public:
-        auto Publish(const std::string& str) -> int;
+        auto Publish(const std::string& str) noexcept -> int;
 
 
     protected:

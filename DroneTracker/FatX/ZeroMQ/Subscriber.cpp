@@ -16,7 +16,7 @@ namespace fatx::zeromq
         ::zmq_ctx_destroy(m_pContext_);
     }
 
-    auto Subscriber::Receive(Buffer_t& buffer) -> int
+    auto Subscriber::Receive(Buffer_t& buffer) noexcept -> int
     {
         return ::zmq_recv(m_pSubscriber_, buffer.data(), buffer.size() - 1, 0);
     }
