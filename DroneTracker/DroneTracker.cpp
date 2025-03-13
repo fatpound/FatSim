@@ -31,7 +31,10 @@ namespace fatsim
             {
                 break;
             }
-            else continue;
+            else
+            {
+                continue;
+            }
 
         wait:
             std::this_thread::sleep_for(std::chrono::milliseconds(50));

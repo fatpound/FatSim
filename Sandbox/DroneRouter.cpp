@@ -44,9 +44,7 @@ namespace fatsim
 
     void DroneRouter::SetDroneObjectID_(const int id)
     {
-        const auto droneName = std::string("SimpleFlight");
-
-        if (const bool success = m_rpc_client_.simSetSegmentationObjectID(droneName, id, true))
+        if (const std::string& droneName = "SimpleFlight"; m_rpc_client_.simSetSegmentationObjectID(droneName, id, true) == true)
         {
             std::println<>("{0} icin segmentasyon id'si ayarlandi...", droneName);
         }
@@ -59,9 +57,9 @@ namespace fatsim
     {
         for (const auto& point : m_route_)
         {
-            const auto x = point.x();
-            const auto y = point.y();
-            const auto z = point.z();
+            const auto& x = point.x();
+            const auto& y = point.y();
+            const auto& z = point.z();
 
             std::println<>("Drone'un gitmekte oldugu konum: {0} {1} {2}", x, y, z);
 

@@ -5,7 +5,6 @@
 #include <vehicles/multirotor/api/MultirotorRpcLibClient.hpp>
 
 #include <opencv2/opencv.hpp>
-#include <opencv2/core.hpp>
 
 #include <string>
 #include <chrono>
@@ -23,13 +22,13 @@ namespace fatsim
     public:
         DroneTracker(std::vector<ImgRequest_t> imgRequests, bool fromExternalCamera = false);
 
-        DroneTracker() = delete;
-        DroneTracker(const DroneTracker&) = delete;
+        DroneTracker()                        = delete;
+        DroneTracker(const DroneTracker&)     = delete;
         DroneTracker(DroneTracker&&) noexcept = delete;
 
         auto operator = (const DroneTracker&)     -> DroneTracker& = delete;
         auto operator = (DroneTracker&&) noexcept -> DroneTracker& = delete;
-        ~DroneTracker() = default;
+        ~DroneTracker() noexcept                                   = default;
 
 
     public:
@@ -47,10 +46,10 @@ namespace fatsim
 
             if constexpr (Padding not_eq 0)
             {
-                box.x = std::max(0, box.x - Padding);
-                box.y = std::max(0, box.y - Padding);
-                box.width = std::min(m_current_frame_.cols  - box.x, box.width  + 2 * Padding);
-                box.height = std::min(m_current_frame_.rows - box.y, box.height + 2 * Padding);
+                box.x      = std::max<>(0, box.x - Padding);
+                box.y      = std::max<>(0, box.y - Padding);
+                box.width  = std::min<>(m_current_frame_.cols - box.x, box.width  + 2 * Padding);
+                box.height = std::min<>(m_current_frame_.rows - box.y, box.height + 2 * Padding);
             }
 
             cv::rectangle(m_current_frame_, box, cv::Scalar(0, 255, 0), 2);
@@ -64,7 +63,7 @@ namespace fatsim
 
         auto ReceivedContinueMsg_    () -> bool;
 
-        void ShowDetectedDrone_      ();
+        void ShowDetectedDrone_();
 
 
     private:
