@@ -16,7 +16,7 @@ namespace fatsim
     {
         m_prev_frame_ = CaptureFrame_();
 
-        while (true)
+        while (not m_finished_)
         {
             if (not ReceivedContinueMsg_())
             {
@@ -83,18 +83,16 @@ namespace fatsim
 
     auto DroneTracker::ReceivedContinueMsg_() -> bool
     {
-        const auto msg = m_zmq_subscriber_.Receive();
-
-        if (not msg.empty())
+        if (const auto& msg = m_zmq_subscriber_.Receive(); not msg.empty())
         {
             std::println<>("Message received: {0}", msg);
 
-            if (msg not_eq "FATSIM_DRONE_MOVING")
+            if (msg == "FATSIM_SIMULATION_ENDED")
             {
-                return false;
+                m_finished_ = true;
             }
 
-            return true;
+            return not m_finished_ and (msg == "FATSIM_DRONE_MOVING" or msg == "FATSIM_DRONE_STOPPED");
         }
 
         return false;

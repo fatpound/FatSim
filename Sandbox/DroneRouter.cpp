@@ -30,14 +30,11 @@ namespace fatsim
         m_rpc_client_.enableApiControl(false);
     }
 
-    void DroneRouter::Run(const unsigned int loopCount)
+    void DroneRouter::Run()
     {
         m_start_signal_.release();
 
-        for (auto j = 0ull; loopCount ? (j < loopCount) : true; ++j)
-        {
-            FollowRoute_();
-        }
+        FollowRoute_();
 
         m_finished_ = true;
     }
@@ -79,7 +76,9 @@ namespace fatsim
 
             m_zmq_publisher_.Publish("FATSIM_DRONE_"s + (m_drone_is_moving_ ? "MOVING"s : "STOPPED"s));
 
-            std::this_thread::sleep_for(50ms);
+            std::this_thread::sleep_for(100ms);
         }
+
+        m_zmq_publisher_.Publish("FATSIM_SIMULATION_ENDED");
     }
 }

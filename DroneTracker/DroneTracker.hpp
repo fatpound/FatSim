@@ -77,5 +77,7 @@ namespace fatsim
 
         cv::Mat m_prev_frame_;
         cv::Mat m_current_frame_;
+
+        bool m_finished_{};
     };
 }

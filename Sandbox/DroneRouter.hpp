@@ -33,7 +33,7 @@ namespace fatsim
 
 
     public:
-        void Run(const unsigned int loopCount = 0u);
+        void Run();
 
 
     protected:
