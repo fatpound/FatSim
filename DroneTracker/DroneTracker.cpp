@@ -80,25 +80,21 @@ namespace fatsim
 
     auto DroneTracker::ReceivedContinueMsg_() -> bool
     {
-        std::array<char, fatx::zeromq::Subscriber::scx_BufferSize> buffer;
+        const auto msg = m_zmq_subscriber_.Receive();
 
-        const auto bytesReceived = m_zmq_subscriber_.Receive(buffer);
-
-        if (bytesReceived > 0)
+        if (not msg.empty())
         {
-            buffer[bytesReceived] = '\0';
-            std::string msg = std::string(buffer.data());
-
             std::println<>("Message received: {0}", msg);
 
             if (msg not_eq "FATSIM_DRONE_MOVING")
             {
                 return false;
             }
-        }
-        else return false;
 
-        return true;
+            return true;
+        }
+
+        return false;
     }
 
     void DroneTracker::ShowDetectedDrone_()

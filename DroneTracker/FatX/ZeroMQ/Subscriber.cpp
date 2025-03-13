@@ -2,22 +2,21 @@
 
 namespace fatx::zeromq
 {
-    Subscriber::Subscriber()
+    Subscriber::Subscriber(const std::string& addr)
         :
-        m_pContext_(::zmq_ctx_new()),
-        m_pSubscriber_(::zmq_socket(m_pContext_, ZMQ_SUB))
+        m_context_(1),
+        m_subscriber_(m_context_, zmq::socket_type::sub)
     {
-        ::zmq_connect(m_pSubscriber_, "tcp://localhost:5555");
-        ::zmq_setsockopt(m_pSubscriber_, ZMQ_SUBSCRIBE, "", 0);
-    }
-    Subscriber::~Subscriber() noexcept
-    {
-        ::zmq_close(m_pSubscriber_);
-        ::zmq_ctx_destroy(m_pContext_);
+        m_subscriber_.connect(addr);
+        m_subscriber_.set(zmq::sockopt::subscribe, "");
     }
 
-    auto Subscriber::Receive(Buffer_t& buffer) noexcept -> int
+    auto Subscriber::Receive() -> std::string
     {
-        return ::zmq_recv(m_pSubscriber_, buffer.data(), buffer.size() - 1, 0);
+        zmq::message_t message;
+
+        m_subscriber_.recv(message, zmq::recv_flags::none);
+
+        return message.to_string();
     }
 }

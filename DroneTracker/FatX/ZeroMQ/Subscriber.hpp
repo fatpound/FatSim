@@ -1,7 +1,7 @@
 #pragma once
 
 #define ZMQ_STATIC
-#include <zmq.h>
+#include <zmq.hpp>
 #undef ZMQ_STATIC
 
 #pragma comment(lib, "iphlpapi")
@@ -13,32 +13,24 @@ namespace fatx::zeromq
     class Subscriber final
     {
     public:
-        static constexpr auto scx_BufferSize = 256;
-
-
-    public:
-        using Buffer_t = std::array<char, scx_BufferSize>;
-
-
-    public:
-        Subscriber();
+        Subscriber(const std::string& addr = "tcp://localhost:5555");
         Subscriber(const Subscriber&)     = delete;
         Subscriber(Subscriber&&) noexcept = delete;
 
         auto operator = (const Subscriber&)     -> Subscriber& = delete;
         auto operator = (Subscriber&&) noexcept -> Subscriber& = delete;
-        ~Subscriber() noexcept;
+        ~Subscriber() noexcept                                 = default;
 
 
     public:
-        auto Receive(Buffer_t& buffer) noexcept -> int;
+        auto Receive() -> std::string;
 
 
     protected:
 
 
     private:
-        void* m_pContext_{};
-        void* m_pSubscriber_{};
+        ::zmq::context_t m_context_;
+        ::zmq::socket_t  m_subscriber_;
     };
 }

@@ -2,21 +2,18 @@
 
 namespace fatx::zeromq
 {
-    Publisher::Publisher(const char* const pAddr) noexcept
+    Publisher::Publisher(const std::string& addr)
         :
-        m_pContext_(::zmq_ctx_new()),
-        m_pPublisher_(::zmq_socket(m_pContext_, ZMQ_PUB))
+        m_context_(1),
+        m_publisher_(m_context_, zmq::socket_type::pub)
     {
-        ::zmq_bind(m_pPublisher_, pAddr);
-    }
-    Publisher::~Publisher() noexcept
-    {
-        ::zmq_close(m_pPublisher_);
-        ::zmq_ctx_destroy(m_pContext_);
+        m_publisher_.bind(addr);
     }
 
-    auto Publisher::Publish(const std::string& str) noexcept -> int
+    auto Publisher::Publish(const std::string& msg) -> std::optional<unsigned long long>
     {
-        return ::zmq_send(m_pPublisher_, str.c_str(), str.size(), 0);
+        zmq::message_t message(msg.begin(), msg.end());
+
+        return m_publisher_.send(message, zmq::send_flags::none);
     }
 }
