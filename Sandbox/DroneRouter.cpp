@@ -30,11 +30,14 @@ namespace fatsim
         m_rpc_client_.enableApiControl(false);
     }
 
-    void DroneRouter::Run()
+    void DroneRouter::Run(const unsigned int loop)
     {
         m_start_signal_.release();
 
-        FollowRoute_();
+        for (auto j = 0u; j < loop; ++j)
+        {
+            FollowRoute_();
+        }
 
         m_finished_ = true;
     }
