@@ -7,6 +7,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Sandbox", "Sandbox\Sandbox.
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DroneTracker", "DroneTracker\DroneTracker.vcxproj", "{C50D37FD-FF8E-4A34-A82B-09116D279C76}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FatLibrary", "FatLibrary\FatLibrary.vcxproj", "{1EEAE2B9-DAA3-45E2-8570-B6ECD8FD9685}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -21,6 +23,10 @@ Global
 		{C50D37FD-FF8E-4A34-A82B-09116D279C76}.Debug|x64.Build.0 = Debug|x64
 		{C50D37FD-FF8E-4A34-A82B-09116D279C76}.Release|x64.ActiveCfg = Release|x64
 		{C50D37FD-FF8E-4A34-A82B-09116D279C76}.Release|x64.Build.0 = Release|x64
+		{1EEAE2B9-DAA3-45E2-8570-B6ECD8FD9685}.Debug|x64.ActiveCfg = Debug|x64
+		{1EEAE2B9-DAA3-45E2-8570-B6ECD8FD9685}.Debug|x64.Build.0 = Debug|x64
+		{1EEAE2B9-DAA3-45E2-8570-B6ECD8FD9685}.Release|x64.ActiveCfg = Release|x64
+		{1EEAE2B9-DAA3-45E2-8570-B6ECD8FD9685}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -15,9 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="FatX\ZeroMQ\Subscriber.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="DroneTracker.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -27,9 +24,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="FatX\ZeroMQ\Subscriber.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
