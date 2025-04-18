@@ -104,11 +104,6 @@
   <ItemGroup>
     <ClInclude Include="DroneRouter.hpp" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\FatLibrary\FatLibrary.vcxproj">
-      <Project>{1eeae2b9-daa3-45e2-8570-b6ecd8fd9685}</Project>
-    </ProjectReference>
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

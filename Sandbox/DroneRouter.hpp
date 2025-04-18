@@ -1,6 +1,6 @@
 #pragma once
 
-#include <_experimental/ZeroMQ/Publisher.hpp>
+#include <_exp/ZeroMQ/Publisher.hpp>
 
 #include <vehicles/multirotor/api/MultirotorRpcLibClient.hpp>
 
