@@ -21,7 +21,7 @@ namespace fatsim
 
 
     public:
-        DroneRouter(std::vector<Position_t> route);
+        DroneRouter(std::vector<Position_t> route, const std::string& trackerPubAddress = "tcp://localhost:5555");
 
         DroneRouter()                       = delete;
         DroneRouter(const DroneRouter&)     = delete;

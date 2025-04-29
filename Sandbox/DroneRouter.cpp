@@ -2,9 +2,10 @@
 
 namespace fatsim
 {
-    DroneRouter::DroneRouter(std::vector<Position_t> route)
+    DroneRouter::DroneRouter(std::vector<Position_t> route, const std::string& trackerPubAddress)
         :
         m_route_(route),
+        m_zmq_publisher_(trackerPubAddress),
 #pragma region (thread w/o C4355)
 #pragma warning (push)
 #pragma warning (disable : 4355)

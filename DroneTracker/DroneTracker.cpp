@@ -7,12 +7,12 @@ namespace fatsim
     DroneTracker::DroneTracker(
         std::vector<ImgRequest_t> imgRequests,
         bool                      captureExternalCamera,
-        const std::string&        routerAddress,
-        const std::string&        unrealAddress)
+        const std::string&        droneRouterSubAddress,
+        const std::string&        unrealEnginePubAddress)
         :
         m_img_requests_(std::move<>(imgRequests)),
-        m_zmq_subscriber_(routerAddress),
-        m_zmq_publisher_(unrealAddress),
+        m_zmq_subscriber_(droneRouterSubAddress),
+        m_zmq_publisher_(unrealEnginePubAddress),
         mc_from_external_camera_(captureExternalCamera)
     {
         m_drone_client_.confirmConnection();
