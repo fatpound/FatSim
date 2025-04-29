@@ -60,7 +60,7 @@ namespace fatsim
             const auto& x = point.x();
             const auto& y = point.y();
             const auto& z = point.z();
-
+            
             std::println<>("Drone'un gitmekte oldugu konum: {0} {1} {2}", x, y, z);
 
             m_drone_is_moving_ = true;
@@ -77,11 +77,15 @@ namespace fatsim
             using std::literals::string_literals::operator ""s;
             using std::literals::chrono_literals::operator ""ms;
 
-            m_zmq_publisher_.Publish("FATSIM_DRONE_"s + (m_drone_is_moving_ ? "MOVING"s : "STOPPED"s));
+            const auto& msg = "FATSIM_DRONE_"s + (m_drone_is_moving_ ? "MOVING"s : "STOPPED"s);
+
+            std::println<>("Publishing message: {}", msg);
+            m_zmq_publisher_.Publish(msg);
 
             std::this_thread::sleep_for(100ms);
         }
 
+        std::println<>("Publishing message: FATSIM_SIMULATION_ENDED");
         m_zmq_publisher_.Publish("FATSIM_SIMULATION_ENDED");
     }
 }
