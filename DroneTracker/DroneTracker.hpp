@@ -24,9 +24,9 @@ namespace fatsim
     public:
         DroneTracker(
             std::vector<ImgRequest_t> imgRequests,
-            bool                      fromExternalCamera = false,
-            const std::string&        routerAddress = "tcp://localhost:5555",
-            const std::string&        unrealAddress = "tcp://*:5556");
+            bool                      captureExternalCamera = false,
+            const std::string&        routerAddress         = "tcp://localhost:5555",
+            const std::string&        unrealAddress         = "tcp://*:5556");
 
         DroneTracker()                        = delete;
         DroneTracker(const DroneTracker&)     = delete;
@@ -91,25 +91,27 @@ namespace fatsim
 
 
     private:
+        inline static const auto            s_drone_bgr_values_ = cv::Scalar(106, 31, 92);
+
+
+    private:
         msr::airlib::MultirotorRpcLibClient m_drone_client_;
 
-        std::vector<ImgRequest_t> m_img_requests_;
+        std::vector<ImgRequest_t>           m_img_requests_;
 
-        fatx::zeromq::Subscriber m_zmq_subscriber_;
-        fatx::zeromq::Publisher  m_zmq_publisher_;
-        
-        const bool mc_from_external_camera_;
+        fatx::zeromq::Subscriber            m_zmq_subscriber_;
+        fatx::zeromq::Publisher             m_zmq_publisher_;
 
         std::vector<std::vector<cv::Point>> m_contours_;
 
-        cv::Mat m_segmentation_frame_;
-        cv::Mat m_masked_frame_;
-        cv::Mat m_display_frame_;
+        cv::Mat                             m_segmentation_frame_;
+        cv::Mat                             m_masked_frame_;
+        cv::Mat                             m_display_frame_;
+        cv::Point                           m_drone_center_ = cv::Point(-1, -1);
 
-        std::ptrdiff_t m_largest_contour_idx_{ -1 };
+        std::ptrdiff_t                      m_largest_contour_idx_{ -1 };
 
-        cv::Point m_drone_center_ = cv::Point(-1, -1);
-
-        bool m_finished_{};
+        const bool                          mc_from_external_camera_;
+        bool                                m_finished_{};
     };
 }

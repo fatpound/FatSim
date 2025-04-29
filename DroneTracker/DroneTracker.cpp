@@ -6,14 +6,14 @@ namespace fatsim
 {
     DroneTracker::DroneTracker(
         std::vector<ImgRequest_t> imgRequests,
-        bool                      fromExternalCamera,
+        bool                      captureExternalCamera,
         const std::string&        routerAddress,
         const std::string&        unrealAddress)
         :
         m_img_requests_(std::move<>(imgRequests)),
         m_zmq_subscriber_(routerAddress),
         m_zmq_publisher_(unrealAddress),
-        mc_from_external_camera_(fromExternalCamera)
+        mc_from_external_camera_(captureExternalCamera)
     {
         m_drone_client_.confirmConnection();
 
@@ -159,7 +159,7 @@ namespace fatsim
             return;
         }
 
-        cv::inRange(m_segmentation_frame_, cv::Scalar(106, 31, 92), cv::Scalar(106, 31, 92), m_masked_frame_);
+        cv::inRange(m_segmentation_frame_, s_drone_bgr_values_, s_drone_bgr_values_, m_masked_frame_);
         ApplyOpeningToMaskedFrame_();
         cv::imshow("Masked Frame", m_masked_frame_);
         cv::findContours(m_masked_frame_, m_contours_, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
@@ -177,10 +177,10 @@ namespace fatsim
             }
         }
 
+        m_display_frame_ = m_segmentation_frame_.clone();
+
         if (foundDrone)
         {
-            m_display_frame_ = m_segmentation_frame_.clone();
-
             cv::circle(m_display_frame_, m_drone_center_, 15, cv::Scalar(0, 255, 0), 2);
 
             cv::line(m_display_frame_, { m_drone_center_.x - 10, m_drone_center_.y      }, { m_drone_center_.x + 10, m_drone_center_.y      }, cv::Scalar(0, 255, 0), 1);
@@ -194,14 +194,14 @@ namespace fatsim
             const auto& msg = std::format("X:{:.1f},Y:{:.1f}", offset_x, offset_y);
             m_zmq_publisher_.Publish(msg);
             std::println<>("Published position: {}", msg);
-
-            cv::imshow("Drone Detection", m_display_frame_);
         }
         else
         {
             m_zmq_publisher_.Publish("Publishing from DroneTracker: FATSIM_DRONE_NOT_FOUND");
             std::println<>("FATSIM_DRONE_NOT_FOUND");
         }
+
+        cv::imshow("Drone Detection", m_display_frame_);
 
         m_largest_contour_idx_ = -1;
         m_contours_     = {};
