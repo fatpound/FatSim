@@ -15,14 +15,14 @@ namespace fatsim
         m_zmq_publisher_(unrealAddress),
         mc_from_external_camera_(fromExternalCamera)
     {
-        m_rpc_client_.confirmConnection();
+        m_drone_client_.confirmConnection();
 
         std::println<>("Starting DroneTracker...");
     }
 
     void DroneTracker::Run()
     {
-        m_prev_frame_ = CaptureFrame_();
+        CaptureFrame_();
 
         while (not m_finished_)
         {
@@ -31,9 +31,18 @@ namespace fatsim
                 goto wait;
             }
 
-            m_current_frame_ = CaptureFrame_();
+            try
+            {
+                CaptureFrame_();
+            }
+            catch (const std::exception& ex)
+            {
+                std::println("{}", ex.what());
+
+                goto wait;
+            }
+
             DetectAndPublishDronePosition_();
-            m_prev_frame_ = m_current_frame_.clone();
 
             if (cv::waitKey(1) == 27)
             {
@@ -45,65 +54,23 @@ namespace fatsim
             }
 
         wait:
-            std::this_thread::sleep_for(std::chrono::milliseconds(50));
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
         }
 
         cv::destroyAllWindows();
         std::println<>("DroneTracker finished.");
     }
     
-    auto DroneTracker::CaptureFrame_() -> cv::Mat
-    {
-        const auto& response = m_rpc_client_.simGetImages(m_img_requests_, "SimpleFlight", mc_from_external_camera_);
-
-        if (response.empty() or response[0].image_data_uint8.empty())
-        {
-            throw std::runtime_error("Failed to capture image from AirSim.");
-        }
-
-        const auto& imgData = response[0].image_data_uint8;
-
-        cv::Mat img(cv::Size(response[0].width, response[0].height), CV_8UC3);
-        std::memcpy(img.data, imgData.data(), imgData.size());
-
-        return img.clone();
-    }
-    auto DroneTracker::GetFrameDifference_() -> cv::Mat
-    {
-        if (m_prev_frame_.empty() or m_current_frame_.empty() or (m_prev_frame_.size() not_eq m_current_frame_.size()))
-        {
-            return {};
-        }
-
-        cv::Mat diff;
-
-        {
-            cv::Mat prevGray;
-            cv::Mat currentGray;
-
-            cv::cvtColor(m_prev_frame_,       prevGray, cv::COLOR_BGR2GRAY);
-            cv::cvtColor(m_current_frame_, currentGray, cv::COLOR_BGR2GRAY);
-
-            cv::absdiff(prevGray, currentGray, diff);
-        }
-        
-
-        return diff;
-    }
     auto DroneTracker::GetDilatedThresholdImg_() -> cv::Mat
     {
-        cv::Mat diff = GetFrameDifference_();
-        
-        if (diff.empty())
-        {
-            return {};
-        }
-
-        cv::Mat thresh;
         cv::Mat threshDilated;
 
-        cv::threshold(diff, thresh, 30, 255, cv::THRESH_BINARY);
-        cv::dilate(thresh, threshDilated, cv::Mat(), cv::Point(-1, -1), 3);
+        {
+            cv::Mat thresh;
+
+            cv::threshold(m_segmentation_frame_, thresh, 30, 255, cv::THRESH_BINARY);
+            cv::dilate(thresh, threshDilated, cv::Mat(), cv::Point(-1, -1), 3);
+        }
 
         return threshDilated;
     }
@@ -122,6 +89,7 @@ namespace fatsim
             else if (msg == "FATSIM_TRACKER_EXITING")
             {
                 m_finished_ = true;
+                std::println<>("Received simulation exit signal.");
             }
 
             return not m_finished_ and (msg == "FATSIM_DRONE_MOVING" or msg == "FATSIM_DRONE_STOPPED");
@@ -130,82 +98,114 @@ namespace fatsim
         return false;
     }
 
+    void DroneTracker::CaptureFrame_()
+    {
+        try
+        {
+            const auto& response = m_drone_client_.simGetImages(m_img_requests_, "SimpleFlight", mc_from_external_camera_);
+
+            if (response.empty())
+            {
+                throw std::runtime_error("Image Response is EMPTY!");
+            }
+
+            if (response[0].image_data_uint8.empty() || response[0].height == 0 || response[0].width == 0)
+            {
+                m_segmentation_frame_.release();
+                throw std::runtime_error("Failed to capture valid image data from AirSim.");
+            }
+
+            m_segmentation_frame_ = cv::Mat(response[0].height, response[0].width, CV_8UC3, static_cast<void*>(const_cast<uchar*>(response[0].image_data_uint8.data()))).clone();
+        }
+        catch (const cv::Exception&)
+        {
+            m_segmentation_frame_.release();
+            throw std::runtime_error("OpenCV exception during Mat creation!");
+        }
+        catch (const std::exception&)
+        {
+            m_segmentation_frame_.release();
+            throw std::runtime_error("OpenCV exception during Mat creation!");
+        }
+    }
+    void DroneTracker::ApplyOpeningToMaskedFrame_()
+    {
+        const auto& kernel = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(3, 3));
+
+        cv::erode(m_masked_frame_,  m_masked_frame_, kernel);
+        cv::dilate(m_masked_frame_, m_masked_frame_, kernel);
+    }
+    void DroneTracker::FindLargestContour_()
+    {
+        double maxArea{};
+
+        for (std::size_t i{}; i < m_contours_.size(); ++i)
+        {
+            const auto& area = cv::contourArea(m_contours_[i]);
+
+            if (area > 15.0 and area > maxArea)
+            {
+                maxArea = area;
+                m_largest_contour_idx_ = i;
+            }
+        }
+    }
     void DroneTracker::DetectAndPublishDronePosition_()
     {
-        cv::Mat detection_mask = GetDilatedThresholdImg_();
-
-        if (detection_mask.empty())
+        if (m_segmentation_frame_.empty())
         {
             m_zmq_publisher_.Publish("FATSIM_DRONE_NOT_FOUND");
-            cv::imshow("Drone Detection", m_current_frame_);
 
             return;
         }
 
-        std::vector<std::vector<cv::Point>> contours;
-        cv::findContours(detection_mask, contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
-        
+        cv::inRange(m_segmentation_frame_, cv::Scalar(106, 31, 92), cv::Scalar(106, 31, 92), m_masked_frame_);
+        ApplyOpeningToMaskedFrame_();
+        cv::imshow("Masked Frame", m_masked_frame_);
+        cv::findContours(m_masked_frame_, m_contours_, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
+        FindLargestContour_();
+
         bool foundDrone{};
-        cv::Point droneCenter(-1, -1);
 
-        auto maxArea = 50.0;
-        auto largestContourIndex = -1;
-
-        for (int i = 0; i < contours.size(); ++i)
+        if (m_largest_contour_idx_ not_eq -1)
         {
-            const auto& area = cv::contourArea(contours[i]);
-
-            if (area > maxArea)
+            if (const auto& drone_moments = cv::moments(m_contours_[m_largest_contour_idx_]); drone_moments.m00 > 0)
             {
-                maxArea = area;
-                largestContourIndex = i;
+                m_drone_center_.x = static_cast<int>(drone_moments.m10 / drone_moments.m00);
+                m_drone_center_.y = static_cast<int>(drone_moments.m01 / drone_moments.m00);
+                foundDrone = true;
             }
-        }
-
-        if (largestContourIndex not_eq -1)
-        {
-            const auto& largestContour = contours[largestContourIndex];
-            DrawRectangleAround_<10>(largestContour);
-            const auto& box = cv::boundingRect(largestContour);
-            droneCenter.x = box.x + box.width  / 2;
-            droneCenter.y = box.y + box.height / 2;
-            foundDrone = true;
         }
 
         if (foundDrone)
         {
-            const auto& center_x = m_current_frame_.cols / 2;
-            const auto& center_y = m_current_frame_.rows / 2;
-            const auto& offset_x = static_cast<float>(droneCenter.x - center_x);
-            const auto& offset_y = static_cast<float>(droneCenter.y - center_y);
+            m_display_frame_ = m_segmentation_frame_.clone();
 
-            std::string msg = std::format("X:{:.1f},Y:{:.1f}", offset_x, offset_y);
+            cv::circle(m_display_frame_, m_drone_center_, 15, cv::Scalar(0, 255, 0), 2);
+
+            cv::line(m_display_frame_, { m_drone_center_.x - 10, m_drone_center_.y      }, { m_drone_center_.x + 10, m_drone_center_.y      }, cv::Scalar(0, 255, 0), 1);
+            cv::line(m_display_frame_, { m_drone_center_.x,      m_drone_center_.y - 10 }, { m_drone_center_.x,      m_drone_center_.y + 10 }, cv::Scalar(0, 255, 0), 1);
+
+            // cv::drawContours(m_display_frame_, m_contours_, m_largest_contour_idx_, cv::Scalar(0, 0, 255), 2);
+
+            const auto& offset_x = static_cast<float>(m_drone_center_.x - (m_segmentation_frame_.cols / 2));
+            const auto& offset_y = static_cast<float>(m_drone_center_.y - (m_segmentation_frame_.rows / 2));
+
+            const auto& msg = std::format("X:{:.1f},Y:{:.1f}", offset_x, offset_y);
             m_zmq_publisher_.Publish(msg);
-            std::println<>("DroneTracker has Published: {}", msg);
+            std::println<>("Published position: {}", msg);
+
+            cv::imshow("Drone Detection", m_display_frame_);
         }
         else
         {
-            m_zmq_publisher_.Publish("FATSIM_DRONE_NOT_FOUND");
-            std::println<>("DroneTracker has Published: NOT_FOUND");
+            m_zmq_publisher_.Publish("Publishing from DroneTracker: FATSIM_DRONE_NOT_FOUND");
+            std::println<>("FATSIM_DRONE_NOT_FOUND");
         }
 
-        cv::imshow("Drone Detection", m_current_frame_);
-    }
-    void DroneTracker::ShowDetectedDrone_()
-    {
-        {
-            std::vector<std::vector<cv::Point>> contours;
-            cv::findContours(GetDilatedThresholdImg_(), contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
-
-            for (const auto& contour : contours)
-            {
-                if (cv::contourArea(contour) > 50)
-                {
-                    DrawRectangleAround_<10>(contour);
-                }
-            }
-        }
-
-        cv::imshow("Drone Detection", m_current_frame_);
+        m_largest_contour_idx_ = -1;
+        m_contours_     = {};
+        m_masked_frame_ = {};
+        m_drone_center_ = cv::Point(-1, -1);
     }
 }

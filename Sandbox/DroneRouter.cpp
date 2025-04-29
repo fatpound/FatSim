@@ -4,37 +4,35 @@ namespace fatsim
 {
     DroneRouter::DroneRouter(std::vector<Position_t> route)
         :
-        m_route_(std::move<>(route)),
-#pragma region (thread w/o C4355)
+        m_route_(route),
 #pragma warning (push)
 #pragma warning (disable : 4355)
         m_msg_kernel_(&DroneRouter::SendZMQMessage_, this)
 #pragma warning (pop)
-#pragma endregion
     {
-        m_rpc_client_.confirmConnection();
-        m_rpc_client_.enableApiControl(true);
-        m_rpc_client_.armDisarm(true);
+        m_drone_client_.confirmConnection();
+        m_drone_client_.enableApiControl(true);
+        m_drone_client_.armDisarm(true);
 
-        SetDroneObjectID_();
+        SetDroneObjectID_(42);
 
         std::println<>("Drone Havalaniyor...");
-        m_rpc_client_.takeoffAsync()->waitOnLastTask();
+        m_drone_client_.takeoffAsync()->waitOnLastTask();
         std::println<>("Drone Havalandi!");
     }
     DroneRouter::~DroneRouter() noexcept(false)
     {
-        m_rpc_client_.landAsync()->waitOnLastTask();
+        m_drone_client_.landAsync()->waitOnLastTask();
 
-        m_rpc_client_.armDisarm(false);
-        m_rpc_client_.enableApiControl(false);
+        m_drone_client_.armDisarm(false);
+        m_drone_client_.enableApiControl(false);
     }
 
-    void DroneRouter::Run(const unsigned int loop)
+    void DroneRouter::Run(const std::size_t& loop)
     {
         m_start_signal_.release();
 
-        for (auto j = 0u; j < loop; ++j)
+        for (std::size_t j{}; j < loop; ++j)
         {
             FollowRoute_();
         }
@@ -42,16 +40,16 @@ namespace fatsim
         m_finished_ = true;
     }
 
-    void DroneRouter::SetDroneObjectID_(const int id)
+    void DroneRouter::SetDroneObjectID_(const int& id)
     {
-        if (const std::string& droneName = "SimpleFlight"; m_rpc_client_.simSetSegmentationObjectID(droneName, id, true) == true)
+        if (const std::string& droneName = "SimpleFlight"; m_drone_client_.simSetSegmentationObjectID(droneName, id, true) == true)
         {
-            std::println<>("{0} icin segmentasyon id'si ayarlandi...", droneName);
+            std::println<>("Segmentation ID: {} set for {}", id, droneName);
+
+            return;
         }
-        else
-        {
-            std::println<>("{0} icin segmentasyon id'si AYARLANAMADI!", droneName);
-        }
+
+        throw std::runtime_error("COULD NOT set Segmentation ID!");
     }
     void DroneRouter::FollowRoute_()
     {
@@ -61,10 +59,10 @@ namespace fatsim
             const auto& y = point.y();
             const auto& z = point.z();
             
-            std::println<>("Drone'un gitmekte oldugu konum: {0} {1} {2}", x, y, z);
+            std::println<>("Drone is going to: X={0} Y={1} Z={2}", x, y, z);
 
             m_drone_is_moving_ = true;
-            m_rpc_client_.moveToPositionAsync(x / 100.0f, y / 100.0f, -(z / 100.0f), scx_DroneSpeed_)->waitOnLastTask();
+            m_drone_client_.moveToPositionAsync(x / 100.0F, y / 100.0F, -(z / 100.0F), scx_DroneSpeed_)->waitOnLastTask();
             m_drone_is_moving_ = false;
         }
     }
@@ -82,10 +80,10 @@ namespace fatsim
             std::println<>("Publishing message: {}", msg);
             m_zmq_publisher_.Publish(msg);
 
-            std::this_thread::sleep_for(100ms);
+            std::this_thread::sleep_for(200ms);
         }
 
-        std::println<>("Publishing message: FATSIM_SIMULATION_ENDED");
         m_zmq_publisher_.Publish("FATSIM_SIMULATION_ENDED");
+        std::println<>("Published: FATSIM_SIMULATION_ENDED");
     }
 }

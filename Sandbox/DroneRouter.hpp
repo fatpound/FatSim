@@ -33,30 +33,28 @@ namespace fatsim
 
 
     public:
-        void Run(const unsigned int loop);
+        void Run(const std::size_t& loop);
 
 
     protected:
 
 
     private:
-        void SetDroneObjectID_(const int id = 42);
+        void SetDroneObjectID_(const int& id);
         void FollowRoute_();
         void SendZMQMessage_();
 
 
     private:
-        msr::airlib::MultirotorRpcLibClient m_rpc_client_;
+        msr::airlib::MultirotorRpcLibClient m_drone_client_;
 
-        std::vector<Position_t> m_route_;
+        std::vector<Position_t>             m_route_;
 
-        fatx::zeromq::Publisher m_zmq_publisher_;
+        fatx::zeromq::Publisher             m_zmq_publisher_;
 
-        std::atomic_bool m_drone_is_moving_{};
-        std::atomic_bool m_finished_{};
-
-        std::binary_semaphore m_start_signal_{ 0 };
-
-        std::jthread m_msg_kernel_;
+        std::atomic_bool                    m_drone_is_moving_{};
+        std::atomic_bool                    m_finished_{};
+        std::binary_semaphore               m_start_signal_{ 0 };
+        std::jthread                        m_msg_kernel_;
     };
 }
