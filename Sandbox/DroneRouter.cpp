@@ -5,10 +5,12 @@ namespace fatsim
     DroneRouter::DroneRouter(std::vector<Position_t> route)
         :
         m_route_(route),
+#pragma region (thread w/o C4355)
 #pragma warning (push)
 #pragma warning (disable : 4355)
         m_msg_kernel_(&DroneRouter::SendZMQMessage_, this)
 #pragma warning (pop)
+#pragma endregion
     {
         m_drone_client_.confirmConnection();
         m_drone_client_.enableApiControl(true);
