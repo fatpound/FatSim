@@ -45,9 +45,9 @@ namespace fatsim
     void DroneTracker::Run()
     {
         std::println<>("DroneTracker has started...");
-        std::println("Capturing first frame...");
+        std::println<>("Capturing first frame...");
         CaptureFrame_();
-        std::println("Captured first frame...");
+        std::println<>("Captured first frame...");
 
         while (not m_finished_)
         {
@@ -62,7 +62,7 @@ namespace fatsim
             }
             catch (const std::exception& ex)
             {
-                std::println("{}", ex.what());
+                std::println<>("{}", ex.what());
 
                 goto wait;
             }
@@ -83,7 +83,7 @@ namespace fatsim
         }
 
         cv::destroyAllWindows();
-        std::println<>("DroneTracker finished.");
+        std::println<>("DroneTracker has finished.");
     }
 
     auto DroneTracker::ReceivedContinueMsg_() -> bool
@@ -95,12 +95,10 @@ namespace fatsim
             if (msg == "FATSIM_SIMULATION_ENDED")
             {
                 m_finished_ = true;
-                std::println<>("Received simulation end signal.");
             }
             else if (msg == "FATSIM_TRACKER_EXITING")
             {
                 m_finished_ = true;
-                std::println<>("Received simulation exit signal.");
             }
 
             return not m_finished_ and (msg == "FATSIM_DRONE_MOVING" or msg == "FATSIM_DRONE_STOPPED");
@@ -112,8 +110,7 @@ namespace fatsim
     {
         if (m_largest_contour_idx_ not_eq -1)
         {
-            if (const auto& drone_moments = cv::moments(m_contours_[m_largest_contour_idx_]);
-                drone_moments.m00 > 0)
+            if (const auto& drone_moments = cv::moments(m_contours_[m_largest_contour_idx_]); drone_moments.m00 > 0)
             {
                 m_drone_center_.x = static_cast<int>(drone_moments.m10 / drone_moments.m00);
                 m_drone_center_.y = static_cast<int>(drone_moments.m01 / drone_moments.m00);
@@ -127,14 +124,14 @@ namespace fatsim
 
     void DroneTracker::CaptureFrame_()
     {
-        const auto& response_vec = m_airlib_client_.simGetImages(m_img_requests_, "", mc_from_external_camera_);
+        const auto& responses = m_airlib_client_.simGetImages(m_img_requests_, "", mc_from_external_camera_);
 
-        if (response_vec.size() < m_img_requests_.size())
+        if (responses.size() < m_img_requests_.size())
         {
             throw std::runtime_error("Could NOT receive responses for all image requests!");
         }
 
-        for (const auto& response : response_vec)
+        for (const auto& response : responses)
         {
             switch (response.image_type)
             {
@@ -174,10 +171,10 @@ namespace fatsim
     }
     void DroneTracker::ProcessSegmentationImage_()
     {
-        cv::inRange(m_segmentation_frame_, s_drone_bgr_values_, s_drone_bgr_values_, m_masked_segmentation_frame_);
+        MaskSegmentationImageWithDroneRGB_();
         ApplyOpeningToMaskedFrame_();
-        ShowMaskedSegmentationFrame_();
-        cv::findContours(m_masked_segmentation_frame_, m_contours_, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
+        DisplayMaskedSegmentationFrame_();
+        FindContours_();
         FindLargestContour_();
     }
     void DroneTracker::ApplyOpeningToMaskedFrame_()
@@ -186,6 +183,15 @@ namespace fatsim
 
         cv::erode(m_masked_segmentation_frame_,  m_masked_segmentation_frame_, kernel);
         cv::dilate(m_masked_segmentation_frame_, m_masked_segmentation_frame_, kernel);
+    }
+    void DroneTracker::MaskSegmentationImageWithDroneRGB_()
+    {
+        cv::inRange(m_segmentation_frame_, s_drone_bgr_values_, s_drone_bgr_values_, m_masked_segmentation_frame_);
+    }
+
+    void DroneTracker::FindContours_()
+    {
+        cv::findContours(m_masked_segmentation_frame_, m_contours_, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
     }
     void DroneTracker::FindLargestContour_()
     {
@@ -211,17 +217,17 @@ namespace fatsim
 
         // cv::drawContours(m_segmentation_frame_, m_contours_, m_largest_contour_idx_, cv::Scalar(0, 0, 255), 2);
     }
-    void DroneTracker::ShowSegmentationFrame_() const
+    void DroneTracker::DisplaySegmentationFrame_() const
     {
         cv::imshow("Segmentation Frame", m_segmentation_frame_);
         std::println<>("displayed: Segmentation Frame");
     }
-    void DroneTracker::ShowDepthFrame_() const
+    void DroneTracker::DisplayDepthFrame_() const
     {
         cv::imshow("Depth Frame", m_depth_frame_);
         std::println<>("displayed: Depth Frame");
     }
-    void DroneTracker::ShowMaskedSegmentationFrame_() const
+    void DroneTracker::DisplayMaskedSegmentationFrame_() const
     {
         cv::imshow("Masked Segmentation Frame", m_masked_segmentation_frame_);
         std::println<>("displayed: Masked Segmentation Frame");
@@ -292,8 +298,8 @@ namespace fatsim
 
 
 show_and_reset:
-        // ShowDepthFrame_();
-        ShowSegmentationFrame_();
+        // DisplayDepthFrame_();
+        DisplaySegmentationFrame_();
 
         Reset_();
     }
