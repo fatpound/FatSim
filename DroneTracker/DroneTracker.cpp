@@ -97,6 +97,21 @@ namespace fatsim
 
         return false;
     }
+    auto DroneTracker::DroneDetected_() -> bool
+    {
+        if (m_largest_contour_idx_ not_eq -1)
+        {
+            if (const auto& drone_moments = cv::moments(m_contours_[m_largest_contour_idx_]); drone_moments.m00 > 0)
+            {
+                m_drone_center_.x = static_cast<int>(drone_moments.m10 / drone_moments.m00);
+                m_drone_center_.y = static_cast<int>(drone_moments.m01 / drone_moments.m00);
+                
+                return true;
+            }
+        }
+
+        return false;
+    }
 
     void DroneTracker::CaptureFrame_()
     {
@@ -150,6 +165,15 @@ namespace fatsim
             }
         }
     }
+    void DroneTracker::MarkDrone_() const
+    {
+        cv::circle(m_display_frame_, m_drone_center_, 15, cv::Scalar(0, 255, 0), 2);
+
+        cv::line(m_display_frame_, { m_drone_center_.x - 10, m_drone_center_.y }, { m_drone_center_.x + 10, m_drone_center_.y }, cv::Scalar(0, 255, 0), 1);
+        cv::line(m_display_frame_, { m_drone_center_.x,      m_drone_center_.y - 10 }, { m_drone_center_.x,      m_drone_center_.y + 10 }, cv::Scalar(0, 255, 0), 1);
+
+        // cv::drawContours(m_display_frame_, m_contours_, m_largest_contour_idx_, cv::Scalar(0, 0, 255), 2);
+    }
     void DroneTracker::DetectAndPublishDronePosition_()
     {
         if (m_segmentation_frame_.empty())
@@ -165,28 +189,11 @@ namespace fatsim
         cv::findContours(m_masked_frame_, m_contours_, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
         FindLargestContour_();
 
-        bool foundDrone{};
-
-        if (m_largest_contour_idx_ not_eq -1)
-        {
-            if (const auto& drone_moments = cv::moments(m_contours_[m_largest_contour_idx_]); drone_moments.m00 > 0)
-            {
-                m_drone_center_.x = static_cast<int>(drone_moments.m10 / drone_moments.m00);
-                m_drone_center_.y = static_cast<int>(drone_moments.m01 / drone_moments.m00);
-                foundDrone = true;
-            }
-        }
-
         m_display_frame_ = m_segmentation_frame_.clone();
 
-        if (foundDrone)
+        if (DroneDetected_())
         {
-            cv::circle(m_display_frame_, m_drone_center_, 15, cv::Scalar(0, 255, 0), 2);
-
-            cv::line(m_display_frame_, { m_drone_center_.x - 10, m_drone_center_.y      }, { m_drone_center_.x + 10, m_drone_center_.y      }, cv::Scalar(0, 255, 0), 1);
-            cv::line(m_display_frame_, { m_drone_center_.x,      m_drone_center_.y - 10 }, { m_drone_center_.x,      m_drone_center_.y + 10 }, cv::Scalar(0, 255, 0), 1);
-
-            // cv::drawContours(m_display_frame_, m_contours_, m_largest_contour_idx_, cv::Scalar(0, 0, 255), 2);
+            MarkDrone_();
 
             const auto& offset_x = static_cast<float>(m_drone_center_.x - (m_segmentation_frame_.cols / 2));
             const auto& offset_y = static_cast<float>(m_drone_center_.y - (m_segmentation_frame_.rows / 2));
@@ -204,8 +211,8 @@ namespace fatsim
         cv::imshow("Drone Detection", m_display_frame_);
 
         m_largest_contour_idx_ = -1;
-        m_contours_     = {};
-        m_masked_frame_ = {};
+        m_contours_.clear();
+        m_masked_frame_.release();
         m_drone_center_ = cv::Point(-1, -1);
     }
 }

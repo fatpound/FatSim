@@ -83,10 +83,12 @@ namespace fatsim
         auto GetDilatedThresholdImg_() -> cv::Mat;
 
         auto ReceivedContinueMsg_() -> bool;
+        auto DroneDetected_() -> bool;
 
         void CaptureFrame_();
         void ApplyOpeningToMaskedFrame_();
         void FindLargestContour_();
+        void MarkDrone_() const;
         void DetectAndPublishDronePosition_();
 
 
