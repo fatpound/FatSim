@@ -4,7 +4,14 @@ int main()
 {
 	using enum msr::airlib::ImageCaptureBase::ImageType;
 
-	fatsim::DroneTracker({ { "alpsword", Segmentation, false, false } }, true).Run();
+	fatsim::DroneTracker(
+        {
+            { "fatsim_segmentation",      Segmentation,     false, false },
+            { "fatsim_depth_perspective", DepthPerspective,  true, false }
+        },
+        true
+    )
+    .Run();
 
 	return 0;
 }

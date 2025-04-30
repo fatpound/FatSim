@@ -46,7 +46,7 @@ namespace fatsim
 
 
     private:
-        msr::airlib::MultirotorRpcLibClient m_drone_client_;
+        msr::airlib::MultirotorRpcLibClient m_airlib_client_;
 
         std::vector<Position_t>             m_route_;
 

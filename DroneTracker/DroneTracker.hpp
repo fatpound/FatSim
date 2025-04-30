@@ -22,6 +22,10 @@ namespace fatsim
 
 
     public:
+        /*
+        *
+        * An important note: first element of 'imgRequests' should be the Depth Perspective camera
+        */
         DroneTracker(
             std::vector<ImgRequest_t> imgRequests,
             bool                      captureExternalCamera  = false,
@@ -80,36 +84,39 @@ namespace fatsim
 
 
     private:
-        auto GetDilatedThresholdImg_() -> cv::Mat;
-
         auto ReceivedContinueMsg_() -> bool;
         auto DroneDetected_() -> bool;
 
         void CaptureFrame_();
+        void ProcessSegmentationImage_();
         void ApplyOpeningToMaskedFrame_();
         void FindLargestContour_();
         void MarkDrone_() const;
+        void ShowSegmentationFrame_() const;
+        void ShowDepthFrame_() const;
+        void ShowMaskedSegmentationFrame_() const;
         void DetectAndPublishDronePosition_();
+        void Reset_();
 
 
     private:
-        inline static const auto            s_drone_bgr_values_ = cv::Scalar(106, 31, 92);
+        inline static const auto            s_drone_bgr_values_ = cv::Scalar(106, 31, 92); // for ID => 42
 
 
     private:
-        msr::airlib::MultirotorRpcLibClient m_drone_client_;
-
-        std::vector<ImgRequest_t>           m_img_requests_;
+        msr::airlib::MultirotorRpcLibClient m_airlib_client_;
+        msr::airlib::CameraInfo             m_depth_camera_info_;
 
         fatx::zeromq::Subscriber            m_zmq_subscriber_;
         fatx::zeromq::Publisher             m_zmq_publisher_;
 
+        std::vector<ImgRequest_t>           m_img_requests_;
         std::vector<std::vector<cv::Point>> m_contours_;
 
-        cv::Mat                             m_segmentation_frame_;
-        cv::Mat                             m_masked_frame_;
-        cv::Mat                             m_display_frame_;
         cv::Point                           m_drone_center_ = cv::Point(-1, -1);
+        cv::Mat                             m_segmentation_frame_;
+        cv::Mat                             m_depth_frame_;
+        cv::Mat                             m_masked_segmentation_frame_;
 
         std::ptrdiff_t                      m_largest_contour_idx_{ -1 };
 

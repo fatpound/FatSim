@@ -13,22 +13,22 @@ namespace fatsim
 #pragma warning (pop)
 #pragma endregion
     {
-        m_drone_client_.confirmConnection();
-        m_drone_client_.enableApiControl(true);
-        m_drone_client_.armDisarm(true);
+        m_airlib_client_.confirmConnection();
+        m_airlib_client_.enableApiControl(true);
+        m_airlib_client_.armDisarm(true);
 
         SetDroneObjectID_(42);
 
-        std::println<>("Drone Havalaniyor...");
-        m_drone_client_.takeoffAsync()->waitOnLastTask();
-        std::println<>("Drone Havalandi!");
+        std::println<>("Drone is taking off...");
+        m_airlib_client_.takeoffAsync()->waitOnLastTask();
+        std::println<>("Drone is airborne...");
     }
     DroneRouter::~DroneRouter() noexcept(false)
     {
-        m_drone_client_.landAsync()->waitOnLastTask();
+        m_airlib_client_.landAsync()->waitOnLastTask();
 
-        m_drone_client_.armDisarm(false);
-        m_drone_client_.enableApiControl(false);
+        m_airlib_client_.armDisarm(false);
+        m_airlib_client_.enableApiControl(false);
     }
 
     void DroneRouter::Run(const std::size_t& loop)
@@ -45,7 +45,7 @@ namespace fatsim
 
     void DroneRouter::SetDroneObjectID_(const int& id)
     {
-        if (const std::string& droneName = "SimpleFlight"; m_drone_client_.simSetSegmentationObjectID(droneName, id, true) == true)
+        if (const std::string& droneName = "SimpleFlight"; m_airlib_client_.simSetSegmentationObjectID(droneName, id, true) == true)
         {
             std::println<>("Segmentation ID: {} set for {}", id, droneName);
 
@@ -65,7 +65,7 @@ namespace fatsim
             std::println<>("Drone is going to : X={0} Y={1} Z={2}", x, y, z);
 
             m_drone_is_moving_ = true;
-            m_drone_client_.moveToPositionAsync(x / 100.0F, y / 100.0F, -(z / 100.0F), scx_DroneSpeed_)->waitOnLastTask();
+            m_airlib_client_.moveToPositionAsync(x / 100.0F, y / 100.0F, -(z / 100.0F), scx_DroneSpeed_)->waitOnLastTask();
             m_drone_is_moving_ = false;
         }
     }
