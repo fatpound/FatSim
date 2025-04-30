@@ -62,7 +62,7 @@ namespace fatsim
             const auto& y = point.y();
             const auto& z = point.z();
             
-            std::println<>("Drone is going to: X={0} Y={1} Z={2}", x, y, z);
+            std::println<>("Drone is going to : X={0} Y={1} Z={2}", x, y, z);
 
             m_drone_is_moving_ = true;
             m_drone_client_.moveToPositionAsync(x / 100.0F, y / 100.0F, -(z / 100.0F), scx_DroneSpeed_)->waitOnLastTask();

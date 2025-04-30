@@ -158,7 +158,7 @@ namespace fatsim
         {
             const auto& area = cv::contourArea(m_contours_[i]);
 
-            if (area > 15.0 and area > maxArea)
+            if (area > 2.5 and area > maxArea)
             {
                 maxArea = area;
                 m_largest_contour_idx_ = i;
