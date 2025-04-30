@@ -23,8 +23,7 @@ namespace fatsim
 
     public:
         /*
-        *
-        * An important note: first element of 'imgRequests' should be the Depth Perspective camera
+        * Note: first element of 'imgRequests' should be the Depth Perspective camera
         */
         DroneTracker(
             std::vector<ImgRequest_t> imgRequests,
@@ -46,41 +45,6 @@ namespace fatsim
 
 
     protected:
-
-
-    private:
-        template <int Padding = 0>
-        void DrawRectangleAround_(const std::vector<cv::Point> contour)
-        {
-            if (m_segmentation_frame_.empty() or contour.empty())
-            {
-                return;
-            }
-
-            cv::Rect box = cv::boundingRect(contour);
-
-            if constexpr (Padding not_eq 0)
-            {
-                box.x = std::max<>(0, box.x - Padding);
-                box.y = std::max<>(0, box.y - Padding);
-
-                const auto& right  = std::min<>(m_segmentation_frame_.cols, box.x + box.width  + Padding);
-                const auto& bottom = std::min<>(m_segmentation_frame_.rows, box.y + box.height + Padding);
-
-                box.width  = right  - box.x;
-                box.height = bottom - box.y;
-            }
-            else
-            {
-                box.width  = std::min(m_segmentation_frame_.cols - box.x, box.width);
-                box.height = std::min(m_segmentation_frame_.rows - box.y, box.height);
-            }
-
-            if (box.width > 0 and box.height > 0)
-            {
-                cv::rectangle(m_segmentation_frame_, box, cv::Scalar(0, 255, 0), 2);
-            }
-        }
 
 
     private:
