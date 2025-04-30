@@ -271,7 +271,7 @@ namespace fatsim
                 const auto& camX = depth_m;
                 const auto& camY = (m_drone_center_.x - cx) * camX / fx;
                 const auto& camZ = (m_drone_center_.y - cy) * camX / fy;
-                const auto& posInCamFrame = msr::airlib::Vector3r(camX, camY, camZ);
+                const auto& posInCamFrame = msr::airlib::Vector3r(static_cast<float>(camX), static_cast<float>(camY), static_cast<float>(camZ));
 
                 const auto& camOrientation = m_depth_camera_info_.pose.orientation;
                 const auto& camPos         = m_depth_camera_info_.pose.position;
