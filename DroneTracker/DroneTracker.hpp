@@ -6,6 +6,8 @@
 #include <vehicles/multirotor/api/MultirotorRpcLibClient.hpp>
 
 #include <opencv2/opencv.hpp>
+#include <opencv2/cudaarithm.hpp>
+#include <opencv2/cudafilters.hpp>
 
 #include <string>
 #include <chrono>
@@ -83,10 +85,12 @@ namespace fatsim
         auto GetDilatedThresholdImg_() -> cv::Mat;
 
         auto ReceivedContinueMsg_() -> bool;
+        auto DroneDetected_() -> bool;
 
         void CaptureFrame_();
         void ApplyOpeningToMaskedFrame_();
         void FindLargestContour_();
+        void MarkDrone_() const;
         void DetectAndPublishDronePosition_();
 
 
@@ -103,6 +107,9 @@ namespace fatsim
         fatx::zeromq::Publisher             m_zmq_publisher_;
 
         std::vector<std::vector<cv::Point>> m_contours_;
+
+        cv::cuda::GpuMat                    m_gpu_segmentation_frame_;
+        cv::cuda::GpuMat                    m_gpu_masked_frame_;
 
         cv::Mat                             m_segmentation_frame_;
         cv::Mat                             m_masked_frame_;
