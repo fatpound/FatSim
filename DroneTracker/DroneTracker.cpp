@@ -233,7 +233,7 @@ namespace fatsim
                 m_zmq_publisher_.Publish("FATSIM_DRONE_NOT_FOUND (Invalid/OutOfRange Depth)");
                 std::println("Invalid or Out-of-Range depth: {:.2f}", depth_m);
 
-                goto show_and_reset;
+                goto display_detection;
             }
             else
             {
@@ -271,7 +271,7 @@ namespace fatsim
         }
 
 
-show_and_reset:
+    display_detection:
         // DisplayDepthFrame_();
         DisplaySegmentationFrame_();
 
