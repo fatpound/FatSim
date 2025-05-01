@@ -1,5 +1,7 @@
 #include "DroneTracker.hpp"
 
+#include <_exp/OpenCV/Contour.hpp>
+
 #include <Math/AngularConv.hpp>
 
 #include <utility>
@@ -171,43 +173,15 @@ namespace fatsim
     }
     void DroneTracker::ProcessSegmentationImage_()
     {
-        MaskSegmentationImageWithDroneRGB_();
-        ApplyOpeningToMaskedFrame_();
-        DisplayMaskedSegmentationFrame_();
-        FindContours_();
-        FindLargestContour_();
-    }
-    void DroneTracker::ApplyOpeningToMaskedFrame_()
-    {
-        const auto& kernel = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(3, 3));
-
-        cv::erode(m_masked_segmentation_frame_,  m_masked_segmentation_frame_, kernel);
-        cv::dilate(m_masked_segmentation_frame_, m_masked_segmentation_frame_, kernel);
-    }
-    void DroneTracker::MaskSegmentationImageWithDroneRGB_()
-    {
         cv::inRange(m_segmentation_frame_, s_drone_bgr_values_, s_drone_bgr_values_, m_masked_segmentation_frame_);
-    }
-
-    void DroneTracker::FindContours_()
-    {
+        cv::erode(m_masked_segmentation_frame_,  m_masked_segmentation_frame_, cv::getStructuringElement(cv::MORPH_RECT, cv::Size(3, 3)));
+        cv::dilate(m_masked_segmentation_frame_, m_masked_segmentation_frame_, cv::getStructuringElement(cv::MORPH_RECT, cv::Size(6, 6)));
+        DisplayMaskedSegmentationFrame_();
         cv::findContours(m_masked_segmentation_frame_, m_contours_, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
-    }
-    void DroneTracker::FindLargestContour_()
-    {
-        double maxArea{};
 
-        for (std::size_t i{}; i < m_contours_.size(); ++i)
-        {
-            const auto& area = cv::contourArea(m_contours_[i]);
-
-            if (area > 2.5 and area > maxArea)
-            {
-                maxArea = area;
-                m_largest_contour_idx_ = i;
-            }
-        }
+        m_largest_contour_idx_ = fatx::opencv::FindLargestContour_(m_contours_, 0.1);
     }
+
     void DroneTracker::MarkDrone_() const
     {
         cv::circle(m_segmentation_frame_, m_drone_center_, 15, cv::Scalar(0, 255, 0), 2);

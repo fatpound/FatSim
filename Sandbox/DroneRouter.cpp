@@ -58,14 +58,14 @@ namespace fatsim
     {
         for (const auto& point : m_route_)
         {
-            const auto& x = point.x();
-            const auto& y = point.y();
-            const auto& z = point.z();
+            const auto& x = point.x() / 100.0F;
+            const auto& y = point.y() / 100.0F;
+            const auto& z = point.z() / 100.0F;
             
             std::println<>("Drone is going to : X={0} Y={1} Z={2}", x, y, z);
 
             m_drone_is_moving_ = true;
-            m_airlib_client_.moveToPositionAsync(x / 100.0F, y / 100.0F, -(z / 100.0F), scx_DroneSpeed_)->waitOnLastTask();
+            m_airlib_client_.moveToPositionAsync(x, y, -z, scx_DroneSpeed_)->waitOnLastTask();
             m_drone_is_moving_ = false;
         }
     }
@@ -83,7 +83,7 @@ namespace fatsim
             std::println<>("Publishing message: {}", msg);
             m_zmq_publisher_.Publish(msg);
 
-            std::this_thread::sleep_for(200ms);
+            std::this_thread::sleep_for(300ms);
         }
 
         m_zmq_publisher_.Publish("FATSIM_SIMULATION_ENDED");

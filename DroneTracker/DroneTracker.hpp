@@ -23,7 +23,7 @@ namespace fatsim
 
     public:
         /*
-        * Note: first element of 'imgRequests' must be the Depth Perspective camera
+        * Note: The first element of 'imgRequests' must be the Depth Perspective camera
         */
         DroneTracker(
             std::vector<ImgRequest_t> imgRequests,
@@ -54,11 +54,6 @@ namespace fatsim
         void CaptureFrame_();
         void ProcessSegmentationImage_();
         void DetectAndPublishDronePosition_();
-
-        void MaskSegmentationImageWithDroneRGB_();
-        void ApplyOpeningToMaskedFrame_();
-        void FindContours_();
-        void FindLargestContour_();
 
         void MarkDrone_() const;
         void DisplaySegmentationFrame_() const;
