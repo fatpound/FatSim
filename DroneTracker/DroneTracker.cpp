@@ -27,7 +27,7 @@ namespace fatsim
         {
             m_depth_camera_info_ = m_airlib_client_.simGetCameraInfo(imgRequests[0].camera_name, "", mc_from_external_camera_);
 
-            std::println(
+            std::println<>(
                 "Depth Camera Info Acquired: Pos({:.2f},{:.2f},{:.2f}), FOV: {:.1f}",
                 m_depth_camera_info_.pose.position.x(), m_depth_camera_info_.pose.position.y(), m_depth_camera_info_.pose.position.z(),
                 m_depth_camera_info_.fov
@@ -35,7 +35,7 @@ namespace fatsim
         }
         catch (const std::exception& ex)
         {
-            std::println(stderr, "Failed to get camera info: {}", ex.what());
+            std::println<>(stderr, "Failed to get camera info: {}", ex.what());
             std::println<>("DroneTracker could NOT start!");
 
             m_finished_ = true;
@@ -240,26 +240,26 @@ namespace fatsim
                 //
                 // World Coordinate Calculation
                 //
-                const auto& fovRad    = fatpound::math::DegToRad<>(m_depth_camera_info_.fov);
-                const auto& imgWidth  = m_segmentation_frame_.cols;
-                const auto& imgHeight = m_segmentation_frame_.rows;
-                const auto& fx = imgWidth / (2.0F * std::tan(fovRad / 2.0F));
-                const auto& fy = fx; // fx=fy ?
-                const auto& cx = imgWidth  / 2.0F;
-                const auto& cy = imgHeight / 2.0F;
+                const auto& fovRad         = fatpound::math::DegToRad<>(m_depth_camera_info_.fov);
+                const auto& imgWidth       = m_segmentation_frame_.cols;
+                const auto& imgHeight      = m_segmentation_frame_.rows;
+                const auto& fx             = imgWidth / (2.0F * std::tan(fovRad / 2.0F));
+                const auto& fy             = fx; // fx=fy ?
+                const auto& cx             = imgWidth  / 2.0F;
+                const auto& cy             = imgHeight / 2.0F;
 
-                const auto& camX = depth_m;
-                const auto& camY = (m_drone_center_.x - cx) * camX / fx;
-                const auto& camZ = (m_drone_center_.y - cy) * camX / fy;
-                const auto& posInCamFrame = msr::airlib::Vector3r(static_cast<float>(camX), static_cast<float>(camY), static_cast<float>(camZ));
+                const auto& camX           = depth_m;
+                const auto& camY           = (m_drone_center_.x - cx) * camX / fx;
+                const auto& camZ           = (m_drone_center_.y - cy) * camX / fy;
+                const auto& posInCamFrame  = msr::airlib::Vector3r(static_cast<float>(camX), static_cast<float>(camY), static_cast<float>(camZ));
 
                 const auto& camOrientation = m_depth_camera_info_.pose.orientation;
                 const auto& camPos         = m_depth_camera_info_.pose.position;
                 const auto& rotatedPos     = camOrientation * posInCamFrame;
                 const auto& droneWorldPos  = camPos + rotatedPos;
 
-                const auto& pos = droneWorldPos;
-                const auto& msg = std::format("WPOS:{:.2f},{:.2f},{:.2f}", pos.x(), pos.y(), pos.z());
+                const auto& pos            = droneWorldPos;
+                const auto& msg            = std::format("WPOS:{:.2f},{:.2f},{:.2f}", pos.x(), pos.y(), pos.z());
                 m_zmq_publisher_.Publish(msg);
                 std::println("Published world position: {}", msg);
             }
