@@ -179,7 +179,7 @@ namespace fatsim
         DisplayMaskedSegmentationFrame_();
         cv::findContours(m_masked_segmentation_frame_, m_contours_, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
 
-        m_largest_contour_idx_ = fatx::opencv::FindLargestContour_(m_contours_, 0.1);
+        m_largest_contour_idx_ = fatx::opencv::FindLargestContour(m_contours_, 0.1);
     }
 
     void DroneTracker::MarkDrone_() const
@@ -281,9 +281,6 @@ show_and_reset:
     {
         m_largest_contour_idx_ = -1;
         m_contours_.clear();
-        m_segmentation_frame_.release();
-        m_depth_frame_.release();
-        m_masked_segmentation_frame_.release();
         m_drone_center_ = cv::Point(-1, -1);
     }
 }
