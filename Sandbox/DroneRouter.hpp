@@ -32,10 +32,6 @@ namespace fatsim
         ~DroneRouter() noexcept(false);
 
 
-    public:
-        void Run(const std::size_t& loop);
-
-
     protected:
 
 
@@ -43,6 +39,7 @@ namespace fatsim
         void SetDroneObjectID_(const int& id);
         void FollowRoute_();
         void SendZMQMessage_();
+        void DetectCrash_();
 
 
     private:
@@ -54,7 +51,15 @@ namespace fatsim
 
         std::atomic_bool                    m_drone_is_moving_{};
         std::atomic_bool                    m_finished_{};
+        std::atomic_bool                    m_emergency_stop_{};
+
         std::binary_semaphore               m_start_signal_{ 0 };
+        std::binary_semaphore               m_finish_signal_{ 0 };
+        std::binary_semaphore               m_zmq_start_signal_{ 0 };
+        std::binary_semaphore               m_crash_detection_start_signal_{ 0 };
+
+        std::jthread                        m_route_follower_;
         std::jthread                        m_msg_kernel_;
+        std::jthread                        m_crash_detector_;
     };
 }

@@ -9,7 +9,9 @@ namespace fatsim
 #pragma region (thread w/o C4355)
 #pragma warning (push)
 #pragma warning (disable : 4355)
-        m_msg_kernel_(&DroneRouter::SendZMQMessage_, this)
+        m_route_follower_(&DroneRouter::FollowRoute_, this),
+        m_msg_kernel_(&DroneRouter::SendZMQMessage_,  this),
+        m_crash_detector_(&DroneRouter::DetectCrash_, this)
 #pragma warning (pop)
 #pragma endregion
     {
@@ -22,25 +24,20 @@ namespace fatsim
         std::println<>("Drone is taking off...");
         m_airlib_client_.takeoffAsync()->waitOnLastTask();
         std::println<>("Drone is airborne...");
+
+        m_start_signal_.release();
     }
     DroneRouter::~DroneRouter() noexcept(false)
     {
-        m_airlib_client_.landAsync()->waitOnLastTask();
+        m_finish_signal_.acquire();
+
+        if (not m_emergency_stop_)
+        {
+            m_airlib_client_.landAsync()->waitOnLastTask();
+        }
 
         m_airlib_client_.armDisarm(false);
         m_airlib_client_.enableApiControl(false);
-    }
-
-    void DroneRouter::Run(const std::size_t& loop)
-    {
-        m_start_signal_.release();
-
-        for (std::size_t j{}; j < loop; ++j)
-        {
-            FollowRoute_();
-        }
-
-        m_finished_ = true;
     }
 
     void DroneRouter::SetDroneObjectID_(const int& id)
@@ -56,24 +53,44 @@ namespace fatsim
     }
     void DroneRouter::FollowRoute_()
     {
-        for (const auto& point : m_route_)
-        {
-            const auto& x = point.x() / 100.0F;
-            const auto& y = point.y() / 100.0F;
-            const auto& z = point.z() / 100.0F;
-            
-            std::println<>("Drone is going to : X={0} Y={1} Z={2}", x, y, z);
+        m_start_signal_.acquire();
 
-            m_drone_is_moving_ = true;
-            m_airlib_client_.moveToPositionAsync(x, y, -z, scx_DroneSpeed_)->waitOnLastTask();
-            m_drone_is_moving_ = false;
+        m_zmq_start_signal_.release();
+        m_crash_detection_start_signal_.release();
+
+        for (std::size_t j{}; j < 2 and not m_emergency_stop_; ++j)
+        {
+            for (const auto& point : m_route_)
+            {
+                if (m_emergency_stop_)
+                {
+                    break;
+                }
+
+                const auto& x = point.x() / 100.0F;
+                const auto& y = point.y() / 100.0F;
+                const auto& z = point.z() / 100.0F;
+
+                std::println<>("Drone is going to : X={0} Y={1} Z={2}", x, y, z);
+
+                m_drone_is_moving_ = true;
+                m_airlib_client_.moveToPositionAsync(x, y, -z, scx_DroneSpeed_)->waitOnLastTask();
+                m_drone_is_moving_ = false;
+            }
+
+            if (m_emergency_stop_)
+            {
+                break;
+            }
         }
+
+        m_finish_signal_.release();
     }
     void DroneRouter::SendZMQMessage_()
     {
-        m_start_signal_.acquire();
+        m_zmq_start_signal_.acquire();
 
-        while (not m_finished_)
+        while (not m_finished_ and not m_emergency_stop_)
         {
             using std::literals::string_literals::operator ""s;
             using std::literals::chrono_literals::operator ""ms;
@@ -83,10 +100,36 @@ namespace fatsim
             std::println<>("Publishing message: {}", msg);
             m_zmq_publisher_.Publish(msg);
 
-            std::this_thread::sleep_for(300ms);
+            std::this_thread::sleep_for(100ms);
         }
 
         m_zmq_publisher_.Publish("FATSIM_SIMULATION_ENDED");
         std::println<>("Published: FATSIM_SIMULATION_ENDED");
+    }
+    void DroneRouter::DetectCrash_()
+    {
+        using std::literals::chrono_literals::operator ""ms;
+
+        m_crash_detection_start_signal_.acquire();
+
+        std::println<>("Starting Crash Detector thread...");
+
+        while (true)
+        {
+            if (m_airlib_client_.simGetCollisionInfo().has_collided
+                and
+                m_airlib_client_.getMultirotorState().getPosition().z() < -2.0F)
+            {
+                std::println<>("Collision detected. Stopping drone...");
+
+                m_emergency_stop_ = true;
+                m_finished_       = true;
+                m_airlib_client_.cancelLastTask();
+
+                break;
+            }
+
+            std::this_thread::sleep_for(10ms);
+        }
     }
 }
