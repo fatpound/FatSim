@@ -23,14 +23,14 @@ namespace fatsim
         SetDroneObjectID_(42);
 
         std::println<>("Drone is taking off...");
-        m_airlib_client_.takeoffAsync()->waitOnLastTask();
-        std::println<>("Drone is airborne...");
+        m_airlib_client_.takeoffAsync();
 
         m_start_signal_.release();
+        m_crash_detection_start_signal_.release();
     }
     DroneRouter::~DroneRouter() noexcept(false)
     {
-        m_finish_signal_.acquire();
+        m_quit_signal_.acquire();
 
         if (not m_emergency_stop_)
         {
@@ -58,10 +58,19 @@ namespace fatsim
     {
         m_start_signal_.acquire();
 
-        std::println<>("Routing drone...");
+        m_airlib_client_.waitOnLastTask();
 
         m_zmq_start_signal_.release();
-        m_crash_detection_start_signal_.release();
+
+        if (m_emergency_stop_)
+        {
+            std::println<>("Emergency Stop signal received in Drone Router thread...");
+
+            goto end;
+        }
+
+        std::println<>("Drone is airborne...");
+        std::println<>("Routing drone...");
 
         for (std::size_t j{}; j < mc_loop_count_ and not m_emergency_stop_; ++j)
         {
@@ -69,7 +78,9 @@ namespace fatsim
             {
                 if (m_emergency_stop_)
                 {
-                    break;
+                    std::println<>("Emergency Stop signal received in Drone Router thread...");
+
+                    goto end;
                 }
 
                 const auto& x = point.x() / 100.0F;
@@ -84,13 +95,27 @@ namespace fatsim
             }
         }
 
+        if (m_emergency_stop_)
+        {
+            std::println<>("Emergency Stop signal received in Drone Router thread...");
+        }
+
+    end:
         m_finished_ = true;
 
+        std::println<>("Drone Router thread is stopping...");
         m_finish_signal_.release();
     }
     void DroneRouter::SendZMQMessage_()
     {
         m_zmq_start_signal_.acquire();
+
+        if (m_emergency_stop_)
+        {
+            std::println<>("Emergency Stop signal received in ZMQ Message Publisher thread...");
+
+            goto end;
+        }
 
         std::println<>("ZMQ Message Publisher thread is starting publishing...");
 
@@ -110,8 +135,13 @@ namespace fatsim
             std::this_thread::sleep_for(100ms);
         }
 
+    end:
         m_zmq_publisher_.Publish("FATSIM_SIMULATION_ENDED");
         std::println<>("Published: FATSIM_SIMULATION_ENDED");
+        std::println<>("ZMQ Message Publisher thread is stopping...");
+
+        m_finish_signal_.acquire();
+        m_quit_signal_.release();
     }
     void DroneRouter::DetectCrash_()
     {
@@ -139,5 +169,7 @@ namespace fatsim
 
             std::this_thread::sleep_for(10ms);
         }
+
+        std::println<>("Crash Detector thread is stopping...");
     }
 }

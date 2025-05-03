@@ -57,6 +57,7 @@ namespace fatsim
 
         std::binary_semaphore               m_start_signal_{ 0 };
         std::binary_semaphore               m_finish_signal_{ 0 };
+        std::binary_semaphore               m_quit_signal_{ 0 };
         std::binary_semaphore               m_zmq_start_signal_{ 0 };
         std::binary_semaphore               m_crash_detection_start_signal_{ 0 };
 
