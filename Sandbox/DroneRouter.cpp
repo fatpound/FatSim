@@ -121,7 +121,7 @@ namespace fatsim
 
         m_crash_detection_start_signal_.acquire();
 
-        std::println<>("Crash Detector thread is starting to receive collision info...");
+        std::println<>("Crash Detector thread is starting receiving collision info...");
 
         static_cast<void>(m_airlib_client_.simGetCollisionInfo());
 
