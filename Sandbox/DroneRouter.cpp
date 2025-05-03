@@ -121,7 +121,6 @@ namespace fatsim
 
         while (not m_finished_ and not m_emergency_stop_)
         {
-            using std::literals::string_literals::operator ""s;
             using std::literals::chrono_literals::operator ""ms;
 
             const auto& msg = m_drone_is_moving_
