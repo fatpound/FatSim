@@ -82,11 +82,6 @@ namespace fatsim
                 m_airlib_client_.moveToPositionAsync(x, y, -z, scx_DroneSpeed_)->waitOnLastTask();
                 m_drone_is_moving_ = false;
             }
-
-            if (m_emergency_stop_)
-            {
-                break;
-            }
         }
 
         m_finished_ = true;
@@ -104,7 +99,10 @@ namespace fatsim
             using std::literals::string_literals::operator ""s;
             using std::literals::chrono_literals::operator ""ms;
 
-            const auto& msg = "FATSIM_DRONE_"s + (m_drone_is_moving_ ? "MOVING"s : "STOPPED"s);
+            const auto& msg = m_drone_is_moving_
+                ? "FATSIM_DRONE_MOVING"
+                : "FATSIM_DRONE_STOPPED"
+                ;
 
             std::println<>("Publishing message: {}", msg);
             m_zmq_publisher_.Publish(msg);
