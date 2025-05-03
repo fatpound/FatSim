@@ -2,10 +2,11 @@
 
 namespace fatsim
 {
-    DroneRouter::DroneRouter(std::vector<Position_t> route, const std::string& trackerPubAddress)
+    DroneRouter::DroneRouter(std::vector<Position_t> route, const std::string& trackerPubAddress, const std::size_t& loopCount)
         :
         m_route_(route),
         m_zmq_publisher_(trackerPubAddress),
+        mc_loop_count_(loopCount),
 #pragma region (thread w/o C4355)
 #pragma warning (push)
 #pragma warning (disable : 4355)
@@ -38,6 +39,8 @@ namespace fatsim
 
         m_airlib_client_.armDisarm(false);
         m_airlib_client_.enableApiControl(false);
+
+        std::println<>("FatSim has finished.");
     }
 
     void DroneRouter::SetDroneObjectID_(const int& id)
@@ -55,10 +58,12 @@ namespace fatsim
     {
         m_start_signal_.acquire();
 
+        std::println<>("Routing drone...");
+
         m_zmq_start_signal_.release();
         m_crash_detection_start_signal_.release();
 
-        for (std::size_t j{}; j < 2 and not m_emergency_stop_; ++j)
+        for (std::size_t j{}; j < mc_loop_count_ and not m_emergency_stop_; ++j)
         {
             for (const auto& point : m_route_)
             {
@@ -84,11 +89,15 @@ namespace fatsim
             }
         }
 
+        m_finished_ = true;
+
         m_finish_signal_.release();
     }
     void DroneRouter::SendZMQMessage_()
     {
         m_zmq_start_signal_.acquire();
+
+        std::println<>("ZMQ Message Publisher thread is starting publishing...");
 
         while (not m_finished_ and not m_emergency_stop_)
         {
@@ -112,18 +121,19 @@ namespace fatsim
 
         m_crash_detection_start_signal_.acquire();
 
-        std::println<>("Starting Crash Detector thread...");
+        std::println<>("Crash Detector thread is starting to receive collision info...");
 
-        while (true)
+        static_cast<void>(m_airlib_client_.simGetCollisionInfo());
+
+        while (not m_finished_)
         {
-            if (m_airlib_client_.simGetCollisionInfo().has_collided
-                and
-                m_airlib_client_.getMultirotorState().getPosition().z() < -2.0F)
+            if (m_airlib_client_.simGetCollisionInfo().has_collided)
             {
                 std::println<>("Collision detected. Stopping drone...");
 
                 m_emergency_stop_ = true;
                 m_finished_       = true;
+
                 m_airlib_client_.cancelLastTask();
 
                 break;

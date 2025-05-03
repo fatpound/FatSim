@@ -21,7 +21,7 @@ namespace fatsim
 
 
     public:
-        DroneRouter(std::vector<Position_t> route, const std::string& trackerPubAddress = "tcp://localhost:5555");
+        DroneRouter(std::vector<Position_t> route, const std::string& trackerPubAddress = "tcp://localhost:5555", const std::size_t& loopCount = 2U);
 
         DroneRouter()                       = delete;
         DroneRouter(const DroneRouter&)     = delete;
@@ -48,6 +48,8 @@ namespace fatsim
         std::vector<Position_t>             m_route_;
 
         fatx::zeromq::Publisher             m_zmq_publisher_;
+
+        const std::size_t                   mc_loop_count_;
 
         std::atomic_bool                    m_drone_is_moving_{};
         std::atomic_bool                    m_finished_{};
