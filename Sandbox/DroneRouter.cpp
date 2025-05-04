@@ -2,7 +2,7 @@
 
 namespace fatsim
 {
-    DroneRouter::DroneRouter(std::vector<Position_t> route, const std::string& trackerPubAddress, const std::size_t& loopCount)
+    DroneRouter::DroneRouter(std::vector<Position_t> route, const std::size_t& loopCount, const std::string& trackerPubAddress)
         :
         m_route_(route),
         m_zmq_publisher_(trackerPubAddress),

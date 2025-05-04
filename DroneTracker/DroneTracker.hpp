@@ -3,9 +3,14 @@
 #include <_exp/ZeroMQ/Subscriber.hpp>
 #include <_exp/ZeroMQ/Publisher.hpp>
 
+#include <FatDefines.hpp>
+
+#pragma warning (push)
+#pragma warning (disable : FAT_EXTERNAL_WARNINGS)
 #include <vehicles/multirotor/api/MultirotorRpcLibClient.hpp>
 
 #include <opencv2/opencv.hpp>
+#pragma warning (pop)
 
 #include <string>
 #include <chrono>

@@ -2,7 +2,12 @@
 
 #include <_exp/ZeroMQ/Publisher.hpp>
 
+#include <FatDefines.hpp>
+
+#pragma warning (push)
+#pragma warning (disable : FAT_EXTERNAL_WARNINGS)
 #include <vehicles/multirotor/api/MultirotorRpcLibClient.hpp>
+#pragma warning (pop)
 
 #include <string>
 #include <chrono>
@@ -21,7 +26,7 @@ namespace fatsim
 
 
     public:
-        DroneRouter(std::vector<Position_t> route, const std::string& trackerPubAddress = "tcp://localhost:5555", const std::size_t& loopCount = 2U);
+        DroneRouter(std::vector<Position_t> route, const std::size_t& loopCount = 2U, const std::string& trackerPubAddress = "tcp://localhost:5555");
 
         DroneRouter()                       = delete;
         DroneRouter(const DroneRouter&)     = delete;
