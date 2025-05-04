@@ -19,7 +19,7 @@ namespace fatsim
         m_airlib_client_.confirmConnection();
         m_airlib_client_.enableApiControl(true);
         m_airlib_client_.armDisarm(true);
-
+        
         SetDroneObjectID_(42);
 
         std::println<>("Drone is taking off...");
@@ -144,8 +144,6 @@ namespace fatsim
     }
     void DroneRouter::DetectCrash_()
     {
-        using std::literals::chrono_literals::operator ""ms;
-
         m_crash_detection_start_signal_.acquire();
 
         std::println<>("Crash Detector thread is starting receiving collision info...");
@@ -165,6 +163,8 @@ namespace fatsim
 
                 break;
             }
+
+            using std::literals::chrono_literals::operator ""ms;
 
             std::this_thread::sleep_for(10ms);
         }
