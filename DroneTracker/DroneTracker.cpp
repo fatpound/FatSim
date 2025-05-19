@@ -174,8 +174,8 @@ namespace fatsim
     void DroneTracker::ProcessSegmentationImage_()
     {
         cv::inRange(m_segmentation_frame_, s_drone_bgr_values_, s_drone_bgr_values_, m_masked_segmentation_frame_);
-        cv::erode(m_masked_segmentation_frame_,  m_masked_segmentation_frame_, cv::getStructuringElement(cv::MORPH_RECT, cv::Size(3, 3)));
-        cv::dilate(m_masked_segmentation_frame_, m_masked_segmentation_frame_, cv::getStructuringElement(cv::MORPH_RECT, cv::Size(6, 6)));
+        // cv::erode(m_masked_segmentation_frame_,  m_masked_segmentation_frame_, cv::getStructuringElement(cv::MORPH_RECT, cv::Size(3, 3)));
+        // cv::dilate(m_masked_segmentation_frame_, m_masked_segmentation_frame_, cv::getStructuringElement(cv::MORPH_RECT, cv::Size(6, 6)));
         DisplayMaskedSegmentationFrame_();
         cv::findContours(m_masked_segmentation_frame_, m_contours_, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
 

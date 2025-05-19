@@ -20,7 +20,7 @@ namespace fatsim
         m_airlib_client_.enableApiControl(true);
         m_airlib_client_.armDisarm(true);
         
-        SetDroneObjectID_(42);
+        SetDroneObjectID_(50);
 
         std::println<>("Drone is taking off...");
         m_airlib_client_.takeoffAsync();

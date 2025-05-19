@@ -69,7 +69,7 @@ namespace fatsim
 
 
     private:
-        inline static const auto            s_drone_bgr_values_ = cv::Scalar(106, 31, 92); // for drone segmentation ID => 42
+        inline static const auto            s_drone_bgr_values_ = cv::Scalar(125, 128, 37); // for drone segmentation ID => 42
 
 
     private:
