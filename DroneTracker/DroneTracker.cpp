@@ -2,7 +2,7 @@
 
 #include <_exp/OpenCV/Contour.hpp>
 
-#include <Math/AngularConv.hpp>
+#include <Math/Geometry/AngularConv.hpp>
 
 #include <utility>
 
@@ -240,7 +240,7 @@ namespace fatsim
                 //
                 // World Coordinate Calculation
                 //
-                const auto& fovRad         = fatpound::math::DegToRad<>(m_depth_camera_info_.fov);
+                const auto& fovRad         = fatpound::math::geometry::DegToRad<>(m_depth_camera_info_.fov);
                 const auto& imgWidth       = m_segmentation_frame_.cols;
                 const auto& imgHeight      = m_segmentation_frame_.rows;
                 const auto& fx             = imgWidth / (2.0F * std::tan(fovRad / 2.0F));
