@@ -221,9 +221,15 @@ namespace fatsim
         {
             MarkDrone_();
 
-            auto depth_m = -1.0;
+            auto depth_m = -1.0F;
 
-            if (m_drone_center_.y >= 0 and m_drone_center_.y < m_depth_frame_.rows and m_drone_center_.x >= 0 and m_drone_center_.x < m_depth_frame_.cols)
+            if (m_drone_center_.y >= 0
+                and
+                m_drone_center_.y < m_depth_frame_.rows
+                and
+                m_drone_center_.x >= 0
+                and
+                m_drone_center_.x < m_depth_frame_.cols)
             {
                 depth_m = m_depth_frame_.at<float>(m_drone_center_.y, m_drone_center_.x);
             }
@@ -237,31 +243,49 @@ namespace fatsim
             }
             else
             {
-                //
-                // World Coordinate Calculation
-                //
-                const auto& fovRad         = fatpound::math::geometry::DegToRad<>(m_depth_camera_info_.fov);
-                const auto& imgWidth       = m_segmentation_frame_.cols;
-                const auto& imgHeight      = m_segmentation_frame_.rows;
-                const auto& fx             = imgWidth / (2.0F * std::tan(fovRad / 2.0F));
-                const auto& fy             = fx; // fx=fy ?
-                const auto& cx             = imgWidth  / 2.0F;
-                const auto& cy             = imgHeight / 2.0F;
+                using fatpound::math::geometry::DegToRad;
+                using fatpound::math::geometry::RadToDeg;
 
-                const auto& camX           = depth_m;
-                const auto& camY           = (m_drone_center_.x - cx) * camX / fx;
-                const auto& camZ           = (m_drone_center_.y - cy) * camX / fy;
-                const auto& posInCamFrame  = msr::airlib::Vector3r(static_cast<float>(camX), static_cast<float>(camY), static_cast<float>(camZ));
+                const auto& fov_rad_horizontal = DegToRad<>(m_depth_camera_info_.fov);
+                const auto& imgWidth           = m_segmentation_frame_.cols;
+                const auto& imgHeight          = m_segmentation_frame_.rows;
+                const auto& aspect_ratio       = static_cast<float>(imgWidth) / static_cast<float>(imgHeight);
+                const auto& fov_rad_vertical   = 2.0F * std::atan(std::tan(fov_rad_horizontal / 2.0F) / aspect_ratio);
+                const auto& fx                 = imgWidth  / (2.0F * std::tan(fov_rad_horizontal / 2.0F));
+                const auto& fy                 = imgHeight / (2.0F * std::tan(fov_rad_vertical / 2.0F));
+                const auto& cx                 = imgWidth  / 2.0F;
+                const auto& cy                 = imgHeight / 2.0F;
 
-                const auto& camOrientation = m_depth_camera_info_.pose.orientation;
-                const auto& camPos         = m_depth_camera_info_.pose.position;
-                const auto& rotatedPos     = camOrientation * posInCamFrame;
-                const auto& droneWorldPos  = camPos + rotatedPos;
+                // Pikselden Kamera Koordinatlarýna (AirSim: +X Fwd, +Y Right, +Z Down)
+                const auto& camX = depth_m;
+                const auto& camY = (m_drone_center_.x - cx) * camX / fx; // Yatay sapma
+                const auto& camZ = (m_drone_center_.y - cy) * camX / fy; // Dikey sapma
 
-                const auto& pos            = droneWorldPos;
-                const auto& msg            = std::format("WPOS:{:.2f},{:.2f},{:.2f}", pos.x(), pos.y(), pos.z());
+                // Yatay Dönüþ Açýsý (Yaw)
+                const auto& targetYaw_rad = std::atan2(static_cast<float>(camY), static_cast<float>(camX));
+                const auto& targetYaw_deg = RadToDeg<>(targetYaw_rad);
+
+                // Dikey Dönüþ Açýsý (Pitch)
+                const auto& targetPitch_rad = std::atan2(static_cast<float>(camZ), static_cast<float>(camX));
+
+                const auto& basePitch_deg = fatpound::math::geometry::RadToDeg<>(targetPitch_rad);
+
+                auto pitch_boost_deg = 0.0f;
+
+                if (camZ < 0.0f) // Derinliðe göre ölçekli yukarý boost
+                {
+                    const auto& dz_norm = (m_drone_center_.y - cy) / static_cast<float>(imgHeight); // normalize [-1, +1]
+                    const auto& steepness = 15.0f;
+                    const auto& boost_factor = std::tanh(steepness * dz_norm);
+
+                    pitch_boost_deg = boost_factor * 10.0f; // Max 10 derece ekleyebilir
+                }
+
+                const auto& targetPitch_deg = basePitch_deg + pitch_boost_deg;
+
+                const auto& msg = std::format("ANGLE:{:.2f},{:.2f}", targetYaw_deg, targetPitch_deg);
                 m_zmq_publisher_.Publish(msg);
-                std::println("Published world position: {}", msg);
+                std::println("Published angles: Yaw={:.2f}, Pitch={:.2f}", targetYaw_deg, targetPitch_deg);
             }
         }
         else

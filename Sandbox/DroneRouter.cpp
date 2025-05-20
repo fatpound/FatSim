@@ -19,7 +19,7 @@ namespace fatsim
         m_airlib_client_.confirmConnection();
         m_airlib_client_.enableApiControl(true);
         m_airlib_client_.armDisarm(true);
-        
+
         SetDroneObjectID_(50);
 
         std::println<>("Drone is taking off...");
@@ -131,7 +131,7 @@ namespace fatsim
             std::println<>("Publishing message: {}", msg);
             m_zmq_publisher_.Publish(msg);
 
-            std::this_thread::sleep_for(100ms);
+            std::this_thread::sleep_for(200ms);
         }
 
     end:
