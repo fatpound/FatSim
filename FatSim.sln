@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.13.35919.96
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Sandbox", "Sandbox\Sandbox.vcxproj", "{310AC11A-EF71-4F38-A25D-E5EEB3131EF0}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DroneTracker", "DroneTracker\DroneTracker.vcxproj", "{C50D37FD-FF8E-4A34-A82B-09116D279C76}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FatLibrary", "FatLibrary\FatLibrary.vcxproj", "{1EEAE2B9-DAA3-45E2-8570-B6ECD8FD9685}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DroneRouter", "DroneRouter\DroneRouter.vcxproj", "{E3C6EA5D-23AF-4E19-9F88-BB836CCB4C10}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,10 +15,6 @@ Global
 		Release|x64 = Release|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{310AC11A-EF71-4F38-A25D-E5EEB3131EF0}.Debug|x64.ActiveCfg = Debug|x64
-		{310AC11A-EF71-4F38-A25D-E5EEB3131EF0}.Debug|x64.Build.0 = Debug|x64
-		{310AC11A-EF71-4F38-A25D-E5EEB3131EF0}.Release|x64.ActiveCfg = Release|x64
-		{310AC11A-EF71-4F38-A25D-E5EEB3131EF0}.Release|x64.Build.0 = Release|x64
 		{C50D37FD-FF8E-4A34-A82B-09116D279C76}.Debug|x64.ActiveCfg = Debug|x64
 		{C50D37FD-FF8E-4A34-A82B-09116D279C76}.Debug|x64.Build.0 = Debug|x64
 		{C50D37FD-FF8E-4A34-A82B-09116D279C76}.Release|x64.ActiveCfg = Release|x64
@@ -27,6 +23,10 @@ Global
 		{1EEAE2B9-DAA3-45E2-8570-B6ECD8FD9685}.Debug|x64.Build.0 = Debug|x64
 		{1EEAE2B9-DAA3-45E2-8570-B6ECD8FD9685}.Release|x64.ActiveCfg = Release|x64
 		{1EEAE2B9-DAA3-45E2-8570-B6ECD8FD9685}.Release|x64.Build.0 = Release|x64
+		{E3C6EA5D-23AF-4E19-9F88-BB836CCB4C10}.Debug|x64.ActiveCfg = Debug|x64
+		{E3C6EA5D-23AF-4E19-9F88-BB836CCB4C10}.Debug|x64.Build.0 = Debug|x64
+		{E3C6EA5D-23AF-4E19-9F88-BB836CCB4C10}.Release|x64.ActiveCfg = Release|x64
+		{E3C6EA5D-23AF-4E19-9F88-BB836CCB4C10}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

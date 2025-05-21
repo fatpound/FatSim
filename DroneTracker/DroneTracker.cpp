@@ -112,7 +112,7 @@ namespace fatsim
     {
         if (m_largest_contour_idx_ not_eq -1)
         {
-            if (const auto& drone_moments = cv::moments(m_contours_[m_largest_contour_idx_]); drone_moments.m00 > 0)
+            if (const auto& drone_moments = cv::moments(m_contours_[static_cast<std::size_t>(m_largest_contour_idx_)]); drone_moments.m00 > 0)
             {
                 m_drone_center_.x = static_cast<int>(drone_moments.m10 / drone_moments.m00);
                 m_drone_center_.y = static_cast<int>(drone_moments.m01 / drone_moments.m00);
@@ -253,13 +253,13 @@ namespace fatsim
                 const auto& fov_rad_vertical   = 2.0F * std::atan(std::tan(fov_rad_horizontal / 2.0F) / aspect_ratio);
                 const auto& fx                 = imgWidth  / (2.0F * std::tan(fov_rad_horizontal / 2.0F));
                 const auto& fy                 = imgHeight / (2.0F * std::tan(fov_rad_vertical / 2.0F));
-                const auto& cx                 = imgWidth  / 2.0F;
-                const auto& cy                 = imgHeight / 2.0F;
+                const auto& cx                 = static_cast<float>(imgWidth)  / 2.0F;
+                const auto& cy                 = static_cast<float>(imgHeight) / 2.0F;
 
                 // Pikselden Kamera Koordinatlarýna (AirSim: +X Fwd, +Y Right, +Z Down)
                 const auto& camX = depth_m;
-                const auto& camY = (m_drone_center_.x - cx) * camX / fx; // Yatay sapma
-                const auto& camZ = (m_drone_center_.y - cy) * camX / fy; // Dikey sapma
+                const auto& camY = (static_cast<float>(m_drone_center_.x) - cx) * camX / fx; // Yatay sapma
+                const auto& camZ = (static_cast<float>(m_drone_center_.y) - cy) * camX / fy; // Dikey sapma
 
                 // Yatay Dönüþ Açýsý (Yaw)
                 const auto& targetYaw_rad = std::atan2(static_cast<float>(camY), static_cast<float>(camX));
@@ -274,7 +274,7 @@ namespace fatsim
 
                 if (camZ < 0.0f) // Derinliðe göre ölçekli yukarý boost
                 {
-                    const auto& dz_norm = (m_drone_center_.y - cy) / static_cast<float>(imgHeight); // normalize [-1, +1]
+                    const auto& dz_norm = (static_cast<float>(m_drone_center_.y) - cy) / static_cast<float>(imgHeight); // normalize [-1, +1]
                     const auto& steepness = 15.0f;
                     const auto& boost_factor = std::tanh(steepness * dz_norm);
 
