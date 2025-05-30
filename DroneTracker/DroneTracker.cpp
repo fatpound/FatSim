@@ -223,13 +223,10 @@ namespace fatsim
 
             auto depth_m = -1.0F;
 
-            if (m_drone_center_.y >= 0
-                and
-                m_drone_center_.y < m_depth_frame_.rows
-                and
-                m_drone_center_.x >= 0
-                and
-                m_drone_center_.x < m_depth_frame_.cols)
+            if (    m_drone_center_.y >= 0
+                and m_drone_center_.y < m_depth_frame_.rows
+                and m_drone_center_.x >= 0
+                and m_drone_center_.x < m_depth_frame_.cols)
             {
                 depth_m = m_depth_frame_.at<float>(m_drone_center_.y, m_drone_center_.x);
             }
