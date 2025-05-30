@@ -269,7 +269,7 @@ namespace fatsim
 
                 auto pitch_boost_deg = 0.0f;
 
-                if (camZ < 0.0f) // Derinliðe göre ölçekli yukarý boost
+                if (camZ < 0.0f)
                 {
                     const auto& dz_norm = (static_cast<float>(m_drone_center_.y) - cy) / static_cast<float>(imgHeight); // normalize [-1, +1]
                     const auto& steepness = 15.0f;
