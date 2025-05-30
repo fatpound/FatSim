@@ -32,7 +32,7 @@ namespace fatsim
         */
         DroneTracker(
             std::vector<ImgRequest_t> imgRequests,
-            bool                      captureExternalCamera  = false,
+            const bool                captureExternalCamera  = false,
             const std::string&        droneRouterSubAddress  = "tcp://localhost:5555",
             const std::string&        unrealEnginePubAddress = "tcp://localhost:5556");
 
