@@ -275,7 +275,7 @@ namespace fatsim
                     const auto& steepness = 15.0f;
                     const auto& boost_factor = std::tanh(steepness * dz_norm);
 
-                    pitch_boost_deg = boost_factor * 10.0f; // Max 10 derece ekleyebilir
+                    pitch_boost_deg = boost_factor * 15.0f; // Max 10 derece ekleyebilir
                 }
 
                 const auto& targetPitch_deg = basePitch_deg + pitch_boost_deg;
