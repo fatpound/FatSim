@@ -234,7 +234,7 @@ namespace fatsim
             if (depth_m < 0.1F or depth_m > 5000.0F or std::isnan(depth_m) or std::isinf(depth_m))
             {
                 m_zmq_publisher_.Publish("FATSIM_DRONE_NOT_FOUND (Invalid/OutOfRange Depth)");
-                std::println("Invalid or Out-of-Range depth: {:.2f}", depth_m);
+                std::println<>("Invalid or Out-of-Range depth: {:.2f}", depth_m);
 
                 goto display_detection;
             }
@@ -258,11 +258,11 @@ namespace fatsim
                 const auto& camY = (static_cast<float>(m_drone_center_.x) - cx) * camX / fx; // Yatay sapma
                 const auto& camZ = (static_cast<float>(m_drone_center_.y) - cy) * camX / fy; // Dikey sapma
 
-                // Yatay Dönüþ Açýsý (Yaw)
+                // Yaw
                 const auto& targetYaw_rad = std::atan2(static_cast<float>(camY), static_cast<float>(camX));
                 const auto& targetYaw_deg = RadToDeg<>(targetYaw_rad);
 
-                // Dikey Dönüþ Açýsý (Pitch)
+                // Pitch
                 const auto& targetPitch_rad = std::atan2(static_cast<float>(camZ), static_cast<float>(camX));
 
                 const auto& basePitch_deg = RadToDeg<>(targetPitch_rad);
@@ -280,7 +280,7 @@ namespace fatsim
 
                 const auto& targetPitch_deg = basePitch_deg + pitch_boost_deg;
 
-                const auto& msg = std::format("ANGLE:{:.2f},{:.2f}", targetYaw_deg, targetPitch_deg);
+                const auto& msg = std::format<>("ANGLE:{:.2f},{:.2f}", targetYaw_deg, targetPitch_deg);
                 m_zmq_publisher_.Publish(msg);
                 std::println("Published angles: Yaw={:.2f}, Pitch={:.2f}", targetYaw_deg, targetPitch_deg);
             }
