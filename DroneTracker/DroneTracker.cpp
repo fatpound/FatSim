@@ -265,7 +265,7 @@ namespace fatsim
                 // Dikey Dönüþ Açýsý (Pitch)
                 const auto& targetPitch_rad = std::atan2(static_cast<float>(camZ), static_cast<float>(camX));
 
-                const auto& basePitch_deg = fatpound::math::geometry::RadToDeg<>(targetPitch_rad);
+                const auto& basePitch_deg = RadToDeg<>(targetPitch_rad);
 
                 auto pitch_boost_deg = 0.0f;
 
