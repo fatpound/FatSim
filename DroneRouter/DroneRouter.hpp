@@ -41,10 +41,10 @@ namespace fatsim
 
 
     private:
-        void SetDroneObjectID_(const int& id);
-        void FollowRoute_();
-        void SendZMQMessage_();
-        void DetectCrash_();
+        void SetDroneObjectID_ (const int& id);
+        void FollowRoute_      ();
+        void SendZMQMessage_   ();
+        void DetectCrash_      ();
 
 
     private:
@@ -57,13 +57,13 @@ namespace fatsim
         const std::size_t                   mc_loop_count_;
 
         std::atomic_bool                    m_drone_is_moving_{};
-        std::atomic_bool                    m_finished_{};
-        std::atomic_bool                    m_emergency_stop_{};
+        std::atomic_bool                    m_finished_       {};
+        std::atomic_bool                    m_emergency_stop_ {};
 
-        std::binary_semaphore               m_start_signal_{ 0 };
-        std::binary_semaphore               m_finish_signal_{ 0 };
-        std::binary_semaphore               m_quit_signal_{ 0 };
-        std::binary_semaphore               m_zmq_start_signal_{ 0 };
+        std::binary_semaphore               m_start_signal_                { 0 };
+        std::binary_semaphore               m_finish_signal_               { 0 };
+        std::binary_semaphore               m_quit_signal_                 { 0 };
+        std::binary_semaphore               m_zmq_start_signal_            { 0 };
         std::binary_semaphore               m_crash_detection_start_signal_{ 0 };
 
         std::jthread                        m_route_follower_;

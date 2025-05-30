@@ -53,17 +53,17 @@ namespace fatsim
 
 
     private:
-        auto ReceivedContinueMsg_() -> bool;
-        auto DroneDetected_() -> bool;
+        auto ReceivedContinueMsg_           () -> bool;
+        auto DroneDetected_                 () -> bool;
 
-        void CaptureFrame_();
-        void ProcessSegmentationImage_();
-        void DetectAndPublishDronePosition_();
+        void CaptureFrame_                  ();
+        void ProcessSegmentationImage_      ();
+        void DetectAndPublishDronePosition_ ();
 
-        void MarkDrone_() const;
-        void DisplaySegmentationFrame_() const;
-        void DisplayDepthFrame_() const;
-        void DisplayMaskedSegmentationFrame_() const;
+        void MarkDrone_                     () const;
+        void ShowSegmentationFrame_         () const;
+        void ShowDepthFrame_                () const;
+        void ShowMaskedSegmentationFrame_   () const;
 
         void Reset_();
 

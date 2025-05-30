@@ -176,7 +176,7 @@ namespace fatsim
         cv::inRange(m_segmentation_frame_, s_drone_bgr_values_, s_drone_bgr_values_, m_masked_segmentation_frame_);
         // cv::erode(m_masked_segmentation_frame_,  m_masked_segmentation_frame_, cv::getStructuringElement(cv::MORPH_RECT, cv::Size(3, 3)));
         // cv::dilate(m_masked_segmentation_frame_, m_masked_segmentation_frame_, cv::getStructuringElement(cv::MORPH_RECT, cv::Size(6, 6)));
-        DisplayMaskedSegmentationFrame_();
+        ShowMaskedSegmentationFrame_();
         cv::findContours(m_masked_segmentation_frame_, m_contours_, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
 
         m_largest_contour_idx_ = fatx::opencv::FindLargestContour(m_contours_, 0.1);
@@ -191,17 +191,17 @@ namespace fatsim
 
         // cv::drawContours(m_segmentation_frame_, m_contours_, m_largest_contour_idx_, cv::Scalar(0, 0, 255), 2);
     }
-    void DroneTracker::DisplaySegmentationFrame_() const
+    void DroneTracker::ShowSegmentationFrame_() const
     {
         cv::imshow("Segmentation Frame", m_segmentation_frame_);
         std::println<>("displayed: Segmentation Frame");
     }
-    void DroneTracker::DisplayDepthFrame_() const
+    void DroneTracker::ShowDepthFrame_() const
     {
         cv::imshow("Depth Frame", m_depth_frame_);
         std::println<>("displayed: Depth Frame");
     }
-    void DroneTracker::DisplayMaskedSegmentationFrame_() const
+    void DroneTracker::ShowMaskedSegmentationFrame_() const
     {
         cv::imshow("Masked Segmentation Frame", m_masked_segmentation_frame_);
         std::println<>("displayed: Masked Segmentation Frame");
@@ -296,8 +296,8 @@ namespace fatsim
 
 
     display_detection:
-        // DisplayDepthFrame_();
-        DisplaySegmentationFrame_();
+        // ShowDepthFrame_();
+        ShowSegmentationFrame_();
 
         Reset_();
     }
