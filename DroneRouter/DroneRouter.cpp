@@ -1,5 +1,9 @@
 #include "DroneRouter.hpp"
 
+#include <stdexcept>
+#include <chrono>
+#include <print>
+
 namespace fatsim
 {
     DroneRouter::DroneRouter(std::vector<Position_t> route, const std::size_t& loopCount, const std::string& trackerPubAddress)
@@ -57,9 +61,7 @@ namespace fatsim
     void DroneRouter::FollowRoute_()
     {
         m_start_signal_.acquire();
-
         m_airlib_client_.waitOnLastTask();
-
         m_zmq_start_signal_.release();
 
         if (m_emergency_stop_)

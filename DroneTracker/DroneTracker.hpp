@@ -7,16 +7,14 @@
 
 #pragma warning (push)
 #pragma warning (disable : FAT_EXTERNAL_WARNINGS)
-#include <vehicles/multirotor/api/MultirotorRpcLibClient.hpp>
-
-#include <opencv2/opencv.hpp>
+    #include <vehicles/multirotor/api/MultirotorRpcLibClient.hpp>
+    #include <opencv2/opencv.hpp>
 #pragma warning (pop)
 
+#include <cstddef>
+
+#include <vector>
 #include <string>
-#include <chrono>
-#include <array>
-#include <print>
-#include <format>
 
 namespace fatsim
 {

@@ -6,14 +6,16 @@
 
 #pragma warning (push)
 #pragma warning (disable : FAT_EXTERNAL_WARNINGS)
-#include <vehicles/multirotor/api/MultirotorRpcLibClient.hpp>
+    #include <vehicles/multirotor/api/MultirotorRpcLibClient.hpp>
 #pragma warning (pop)
 
+#include <cstddef>
+
+#include <vector>
 #include <string>
-#include <chrono>
+#include <atomic>
 #include <thread>
 #include <semaphore>
-#include <print>
 
 namespace fatsim
 {
@@ -26,7 +28,10 @@ namespace fatsim
 
 
     public:
-        DroneRouter(std::vector<Position_t> route, const std::size_t& loopCount = 2U, const std::string& trackerPubAddress = "tcp://localhost:5555");
+        DroneRouter(
+            std::vector<Position_t> route,
+            const std::size_t&      loopCount         = 2U,
+            const std::string&      trackerPubAddress = "tcp://localhost:5555");
 
         DroneRouter()                       = delete;
         DroneRouter(const DroneRouter&)     = delete;

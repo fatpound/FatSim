@@ -4,7 +4,15 @@
 
 #include <Math/Geometry/AngularConv.hpp>
 
+#include <cmath>
+
 #include <utility>
+#include <chrono>
+#include <array>
+#include <format>
+#include <print>
+#include <stdexcept>
+#include <thread>
 
 namespace fatsim
 {
@@ -135,9 +143,11 @@ namespace fatsim
 
         for (const auto& response : responses)
         {
+            using enum msr::airlib::ImageCaptureBase::ImageType;
+
             switch (response.image_type)
             {
-            case msr::airlib::ImageCaptureBase::ImageType::Segmentation:
+            case Segmentation:
             {
                 if (response.image_data_uint8.empty() or response.height == 0 or response.width == 0)
                 {
@@ -151,7 +161,7 @@ namespace fatsim
             }
                 break;
 
-            case msr::airlib::ImageCaptureBase::ImageType::DepthPerspective:
+            case DepthPerspective:
             {
                 if (response.image_data_float.empty() or response.height == 0 or response.width == 0)
                 {
@@ -275,7 +285,7 @@ namespace fatsim
                     const auto& steepness = 15.0f;
                     const auto& boost_factor = std::tanh(steepness * dz_norm);
 
-                    pitch_boost_deg = boost_factor * 15.0f; // Max 10 derece ekleyebilir
+                    pitch_boost_deg = boost_factor * 15.0f;
                 }
 
                 const auto& targetPitch_deg = basePitch_deg + pitch_boost_deg;
