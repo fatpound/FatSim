@@ -263,10 +263,10 @@ namespace fatsim
                 const auto& cx                 = static_cast<float>(imgWidth)  / 2.0F;
                 const auto& cy                 = static_cast<float>(imgHeight) / 2.0F;
 
-                // Pikselden Kamera Koordinatlarýna (AirSim: +X Fwd, +Y Right, +Z Down)
+                // Pixel to Camera Coordinates (AirSim: +X Fwd, +Y Right, +Z Down)
                 const auto& camX = depth_m;
-                const auto& camY = (static_cast<float>(m_drone_center_.x) - cx) * camX / fx; // Yatay sapma
-                const auto& camZ = (static_cast<float>(m_drone_center_.y) - cy) * camX / fy; // Dikey sapma
+                const auto& camY = (static_cast<float>(m_drone_center_.x) - cx) * camX / fx; // Horizontal Diff
+                const auto& camZ = (static_cast<float>(m_drone_center_.y) - cy) * camX / fy; //   Vertical Diff
 
                 // Yaw
                 const auto& targetYaw_rad = std::atan2(static_cast<float>(camY), static_cast<float>(camX));
