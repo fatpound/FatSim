@@ -1,0 +1,56 @@
+{
+  "SettingsVersion": 1.2,
+  "SimMode": "Multirotor",
+
+  "LogMessagesVisible": true,
+
+  "CameraDefaults": {
+    "CaptureSettings": [
+      {
+        "ImageType": 0,
+        "Width": 1280,
+        "Height": 720
+      },
+      {
+        "ImageType": 2,
+        "Width": 1280,
+        "Height": 720
+      },
+      {
+        "ImageType": 3,
+        "Width": 1280,
+        "Height": 720
+      },
+      {
+        "ImageType": 5,
+        "Width": 1280,
+        "Height": 720
+      }
+    ]
+  },
+
+  "SubWindows": [
+    {"WindowID": 0, "CameraName": "0",                        "ImageType": 0, "VehicleName": "", "Visible": false, "External": false},
+    {"WindowID": 1, "CameraName": "fatsim_depth_perspective", "ImageType": 2, "VehicleName": "", "Visible": false, "External": true},
+    {"WindowID": 2, "CameraName": "fatsim_segmentation",      "ImageType": 5, "VehicleName": "", "Visible": false, "External": true}
+  ],
+
+  "ExternalCameras": {
+    "fatsim_depth_perspective": {
+        "X": -21.15615,
+        "Y": -41.0103,
+        "Z": -10.4688,
+        "Pitch": 0,
+        "Roll": 0,
+        "Yaw": 0
+    },
+    "fatsim_segmentation": {
+        "X": -21.15615,
+        "Y": -41.0103,
+        "Z": -10.4688,
+        "Pitch": 0,
+        "Roll": 0,
+        "Yaw": 0
+    }
+  }
+}
