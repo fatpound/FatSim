@@ -2,10 +2,10 @@
 
 #include <_exp/ZeroMQ/Publisher.hpp>
 
-#include <FatMacros.hpp>
+#include <_macros/Compiler.hpp>
 
 #pragma warning (push)
-#pragma warning (disable : FAT_EXTERNAL_WARNINGS)
+#pragma warning (disable : FATLIB_EXTERNAL_WARNINGS)
     #include <vehicles/multirotor/api/MultirotorRpcLibClient.hpp>
 #pragma warning (pop)
 
