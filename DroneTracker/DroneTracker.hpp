@@ -3,12 +3,16 @@
 #include <_exp/ZeroMQ/Subscriber.hpp>
 #include <_exp/ZeroMQ/Publisher.hpp>
 
-#include <_macros/Compiler.hpp>
+#include <_macros/Experimental.hpp>
 
 #pragma warning (push)
-#pragma warning (disable : FATLIB_EXTERNAL_WARNINGS)
+#pragma warning (disable : MSVC_EXWARN_AIRSIM)
     #include <vehicles/multirotor/api/MultirotorRpcLibClient.hpp>
-    #include <opencv2/opencv.hpp>
+#pragma warning (pop)
+
+#pragma warning (push)
+#pragma warning (disable : MSVC_EXWARN_OPENCV)
+#include <opencv2/opencv.hpp>
 #pragma warning (pop)
 
 #include <cstddef>
