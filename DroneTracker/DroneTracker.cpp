@@ -2,7 +2,7 @@
 
 #include <_exp/OpenCV/Contour.hpp>
 
-#include <Math/Geometry/AngularConv.hpp>
+#include <Math/Geometry/include/AngularConv.hpp>
 
 #include <cmath>
 
@@ -258,8 +258,8 @@ namespace fatsim
                 const auto& imgHeight          = m_segmentation_frame_.rows;
                 const auto& aspect_ratio       = static_cast<float>(imgWidth) / static_cast<float>(imgHeight);
                 const auto& fov_rad_vertical   = 2.0F * std::atan(std::tan(fov_rad_horizontal / 2.0F) / aspect_ratio);
-                const auto& fx                 = imgWidth  / (2.0F * std::tan(fov_rad_horizontal / 2.0F));
-                const auto& fy                 = imgHeight / (2.0F * std::tan(fov_rad_vertical / 2.0F));
+                const auto& fx                 = static_cast<float>(imgWidth)  / (2.0F * std::tan(fov_rad_horizontal / 2.0F));
+                const auto& fy                 = static_cast<float>(imgHeight) / (2.0F * std::tan(fov_rad_vertical / 2.0F));
                 const auto& cx                 = static_cast<float>(imgWidth)  / 2.0F;
                 const auto& cy                 = static_cast<float>(imgHeight) / 2.0F;
 

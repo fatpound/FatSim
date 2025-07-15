@@ -40,16 +40,16 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="..\FatLibrary\_misc\FatProps\FatAirSim_Debug.props" />
     <Import Project="..\FatLibrary\_misc\FatProps\FatCpp_Debug.props" />
-    <Import Project="..\FatLibrary\_misc\FatProps\FatZMQ_Debug.props" />
-    <Import Project="..\FatLibrary\_misc\FatProps\FatCV4_Debug.props" />
+    <Import Project="..\FatLibrary\_misc\FatProps\FatZeroMQ_Debug.props" />
+    <Import Project="..\FatLibrary\_misc\FatProps\FatOpenCV4_Debug.props" />
     <Import Project="..\FatLibrary\_misc\FatProps\FatLibrary.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="..\FatLibrary\_misc\FatProps\FatAirSim_Release.props" />
     <Import Project="..\FatLibrary\_misc\FatProps\FatCpp_Release.props" />
-    <Import Project="..\FatLibrary\_misc\FatProps\FatZMQ_Release.props" />
-    <Import Project="..\FatLibrary\_misc\FatProps\FatCV4_Release.props" />
+    <Import Project="..\FatLibrary\_misc\FatProps\FatZeroMQ_Release.props" />
+    <Import Project="..\FatLibrary\_misc\FatProps\FatOpenCV4_Release.props" />
     <Import Project="..\FatLibrary\_misc\FatProps\FatLibrary.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
@@ -89,6 +89,11 @@
   <ItemGroup>
     <ClCompile Include="DroneTracker.cpp" />
     <ClCompile Include="Main.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\FatLibrary\FatLibrary.vcxproj">
+      <Project>{1eeae2b9-daa3-45e2-8570-b6ecd8fd9685}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
