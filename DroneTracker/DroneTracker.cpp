@@ -250,8 +250,8 @@ namespace fatsim
             }
             else
             {
-                using fatpound::math::geometry::DegToRad;
-                using fatpound::math::geometry::RadToDeg;
+                using fatpound::geometry::DegToRad;
+                using fatpound::geometry::RadToDeg;
 
                 const auto& fov_rad_horizontal = DegToRad<>(m_depth_camera_info_.fov);
                 const auto& imgWidth           = m_segmentation_frame_.cols;
