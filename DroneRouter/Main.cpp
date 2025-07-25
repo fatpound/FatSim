@@ -2,7 +2,7 @@
 
 int main()
 {
-    fatsim::DroneRouter
+    fatsim::DroneRouter drouter
     {
         {
            { 200,     0,  150 },

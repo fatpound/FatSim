@@ -54,11 +54,11 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <CodeAnalysisRuleSet>..\FatLibrary\_misc\FatRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSet>..\FatLibrary\_misc\FatCodex\FatRules.ruleset</CodeAnalysisRuleSet>
     <UseStructuredOutput>false</UseStructuredOutput>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <CodeAnalysisRuleSet>..\FatLibrary\_misc\FatRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSet>..\FatLibrary\_misc\FatCodex\FatRules.ruleset</CodeAnalysisRuleSet>
     <UseStructuredOutput>false</UseStructuredOutput>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
