@@ -55,11 +55,14 @@ namespace fatsim
 
 
     private:
-        auto ReceivedContinueMsg_           () -> bool;
-        auto DroneDetected_                 () -> bool;
+        auto ReceivedContinueMsg_           ()                -> bool;
+        auto DroneDetected_                 () const noexcept -> bool;
+        auto DroneDepthIsValid_             () const noexcept -> bool;
 
         void CaptureFrame_                  ();
         void ProcessSegmentationImage_      ();
+        void ProcessDepthImage_             ();
+        void ProcessDroneCenter_            ();
         void DetectAndPublishDronePosition_ ();
 
         void MarkDrone_                     () const;
@@ -91,7 +94,9 @@ namespace fatsim
 
         std::ptrdiff_t                      m_largest_contour_idx_{ -1 };
 
+        float                               m_drone_depth_{ -1.0F };
         const bool                          mc_from_external_camera_;
+        bool                                m_drone_found_{};
         bool                                m_finished_{};
     };
 }
