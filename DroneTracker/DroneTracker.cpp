@@ -297,7 +297,7 @@ namespace fatsim
 
         const auto& imgWidth    = static_cast<float>(m_segmentation_frame_.cols);
         const auto& imgHeight   = static_cast<float>(m_segmentation_frame_.rows);
-        const auto& focalLength = CalculateFocalLength<>(DegToRad<>(m_depth_camera_info_.fov), imgWidth);
+        const auto& focalLength = FocalLength<>(DegToRad<>(m_depth_camera_info_.fov), imgWidth);
 
         const auto& camX = m_drone_depth_;
         const auto& camY = UnprojectPixelCoordinate<>(static_cast<float>(m_drone_center_.x), imgWidth  / 2.0F, camX, focalLength);
@@ -307,7 +307,7 @@ namespace fatsim
         const auto& targetPitch = CalculatePitch_Deg<>(camX, camZ);
         
         m_zmq_publisher_.Publish(std::format<>("ANGLE:{:.2f},{:.2f}", targetYaw, targetPitch));
-        std::println("Published angles: Yaw={:.2f}, Pitch={:.2f}", targetYaw, targetPitch);
+        std::println<>("Published angles: Yaw={:.2f}, Pitch={:.2f}", targetYaw, targetPitch);
     }
     void DroneTracker::Reset_()
     {
