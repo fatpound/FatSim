@@ -3,6 +3,9 @@
 #include <_exp/OpenCV/Contour.hpp>
 
 #include <Geometry/include/AngularConv.hpp>
+#include <Geometry/include/EulerAngles.hpp>
+#include <Geometry/include/FieldOfView.hpp>
+#include <Geometry/include/Projection.hpp>
 
 #include <cmath>
 
@@ -288,24 +291,20 @@ namespace fatsim
             return;
         }
 
-    //  MarkDrone_();
+        MarkDrone_();
 
-        using fatpound::geometry::DegToRad;
-        using fatpound::geometry::RadToDeg;
+        using namespace fatpound::geometry;
 
         const auto& imgWidth    = static_cast<float>(m_segmentation_frame_.cols);
         const auto& imgHeight   = static_cast<float>(m_segmentation_frame_.rows);
-        const auto& hFovRad     = DegToRad<>(m_depth_camera_info_.fov);
-        const auto& focalLength = imgWidth  / (2.0F * std::tan(hFovRad / 2.0F));
-        const auto& cx          = imgWidth  / 2.0F;
-        const auto& cy          = imgHeight / 2.0F;
+        const auto& focalLength = CalculateFocalLength<>(DegToRad<>(m_depth_camera_info_.fov), imgWidth);
 
         const auto& camX = m_drone_depth_;
-        const auto& camY = (static_cast<float>(m_drone_center_.x) - cx) * camX / focalLength;
-        const auto& camZ = (static_cast<float>(m_drone_center_.y) - cy) * camX / focalLength;
+        const auto& camY = UnprojectPixelCoordinate<>(static_cast<float>(m_drone_center_.x), imgWidth  / 2.0F, camX, focalLength);
+        const auto& camZ = UnprojectPixelCoordinate<>(static_cast<float>(m_drone_center_.y), imgHeight / 2.0F, camX, focalLength);
 
-        const auto& targetYaw   = RadToDeg<>(std::atan2(camY, camX));
-        const auto& targetPitch = RadToDeg<>(std::atan2(camZ, camX));
+        const auto& targetYaw   = CalculateYaw_Deg<>(camX, camY);
+        const auto& targetPitch = CalculatePitch_Deg<>(camX, camZ);
         
         m_zmq_publisher_.Publish(std::format<>("ANGLE:{:.2f},{:.2f}", targetYaw, targetPitch));
         std::println("Published angles: Yaw={:.2f}, Pitch={:.2f}", targetYaw, targetPitch);
